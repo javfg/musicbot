@@ -1,0 +1,21 @@
+# musicbot docker-compose!
+# 2021-04-10
+version: '3.8'
+
+services:
+  musicbot:
+    build:
+      args:
+        - 'MUSICBOT_ENV=${MUSICBOT_ENV:-dev}'
+      context: musicbot/
+      target: ${MUSICBOT_ENV:-dev}
+    container_name: musicbot
+    env_file:
+      - '.${MUSICBOT_ENV:-dev}.env'
+    volumes:
+      - type: bind
+        source: musicbot
+        target: /musicbot
+      - type: bind
+        source: tools
+        target: /tools

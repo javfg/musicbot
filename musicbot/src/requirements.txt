@@ -1,0 +1,7 @@
+bottle==0.12.19
+python_telegram_bot==13.11.0
+spotipy==2.19.0
+sty==1.0.4
+tinydb==4.6.1
+tinydb-serialization==2.1.0
+youtube_dl>=2021.12.17
