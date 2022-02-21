@@ -84,9 +84,9 @@ class Provider:
         except KeyError:
             logger.warn(f"failure [{uri}]: missing metadata")
             raise YoutubeMetadataNotFoundException
-
         except Exception as error:
-            logger.error(f"failure [{uri}]: {error.msg}")
+            msg = getattr(error, "msg", error)
+            logger.error(f"failure [{uri}]: {msg}")
             raise
 
     def _youtube_uri_from_name(self, name: str) -> Optional[str]:

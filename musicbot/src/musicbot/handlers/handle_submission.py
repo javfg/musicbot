@@ -2,8 +2,11 @@ import logging
 
 from datetime import datetime
 
+from requests.exceptions import HTTPError
+from spotipy import SpotifyException
 from telegram.ext.callbackcontext import CallbackContext
 from telegram.update import Update
+from youtube_dl.utils import DownloadError
 
 from musicbot.model.failed_submission import FailedSubmission
 from musicbot.model.handler import Handler
@@ -32,6 +35,10 @@ class HandleSubmission(Handler):
         except (SpotifyEntityNotFoundException, YoutubeMetadataNotFoundException):
             self.not_found()
             return
+        except (SpotifyException, HTTPError, DownloadError) as error:
+            msg = getattr(error, "http_status", error)
+            logger.error(f"provider returned {msg}")
+            return
 
         if provider.uri:
             logger.info(f"valid uri [{self.message_uri}]: fetching...")
@@ -40,6 +47,10 @@ class HandleSubmission(Handler):
                 submission = provider.fetch(self.dj, datetime.now())
             except (SpotifyEntityNotFoundException):
                 self.not_found()
+            except (SpotifyException, HTTPError, DownloadError) as error:
+                msg = getattr(error, "http_status", error)
+                logger.error(f"provider returned {msg}")
+                return
 
             self.delete_message(chat_id=self.chat_id, message_id=self.message_id)
             self.send_message(submission.to_md())
