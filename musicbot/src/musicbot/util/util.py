@@ -21,7 +21,7 @@ def _(str: str) -> str:
 
 
 def get_start_of_week() -> datetime:
-    return datetime.now() - timedelta(days=datetime.today().isoweekday() - 1)
+    return datetime.now().replace(hour=0, minute=0, second=0) - timedelta(days=datetime.today().isoweekday() - 1)
 
 
 def get_start_of_month() -> datetime:
