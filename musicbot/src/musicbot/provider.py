@@ -15,8 +15,8 @@ from musicbot.util.exceptions import SpotifyEntityNotFoundException, YoutubeMeta
 
 logger = logging.getLogger(__name__)
 
-SPOTIFY_REGEX = r"^(spotify:|https://open\.spotify\.com/)(track|album|artist)"
-YOUTUBE_REGEX = r"^https://(www\.youtube\.com/watch\?v=|youtu\.be/)"
+SPOTIFY_REGEX = r"^(spotify:|https://open\.spotify\.com/)(track|album|artist)[/:][A-Za-z0-9]{22}$"
+YOUTUBE_REGEX = r"^https://(www\.youtube\.com/watch\?v=|youtu\.be/)[A-Za-z0-9_-]{11}$"
 
 
 class Provider:
