@@ -3,7 +3,7 @@ import logging
 from telegram.ext.callbackcontext import CallbackContext
 
 from musicbot.config import config, db_manager
-from musicbot.model.messageactionsmixin import MessageActionsMixin
+from musicbot.model.message_actions_mixin import MessageActionsMixin
 from musicbot.util.db import DB
 
 

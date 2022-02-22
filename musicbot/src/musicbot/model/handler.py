@@ -4,7 +4,7 @@ from telegram.ext.callbackcontext import CallbackContext
 from telegram.update import Update
 
 from musicbot.config import db_manager
-from musicbot.model.messageactionsmixin import MessageActionsMixin
+from musicbot.model.message_actions_mixin import MessageActionsMixin
 
 
 class Handler(MessageActionsMixin):

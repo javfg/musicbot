@@ -2,6 +2,7 @@ import logging
 
 from datetime import time, timedelta
 
+from pytz import timezone
 from telegram.ext import Filters, Updater
 
 from musicbot.config import config
@@ -9,7 +10,7 @@ from musicbot.handlers.handle_amend import HandleAmend
 from musicbot.handlers.handle_chatid import HandleChatId
 from musicbot.handlers.handle_digest import DailyDigest, HandleDigest, WeeklyDigest
 from musicbot.handlers.handle_help import HandleHelp
-from musicbot.handlers.handle_ranking import HandleRanking
+from musicbot.handlers.handle_ranking import HandleRanking, MonthlyRanking
 from musicbot.handlers.handle_stats import HandleStats
 from musicbot.handlers.handle_submission import HandleSubmission
 from musicbot.handlers.handle_tag import HandleTag
@@ -92,9 +93,11 @@ def main() -> None:
     dispatcher = updater.dispatcher
     scheduler = updater.job_queue
 
-    # schedulers (times are UTC)
-    scheduler.run_daily(DailyDigest, time(11))
-    scheduler.run_repeating(WeeklyDigest, timedelta(days=7), time(22))
+    # schedulers
+    tz = timezone("Europe/Zurich")
+    scheduler.run_daily(DailyDigest, time(10, tzinfo=tz))
+    scheduler.run_repeating(WeeklyDigest, timedelta(days=7), time(22, tzinfo=tz))
+    scheduler.run_monthly(MonthlyRanking, time(22, 18, 40, tzinfo=tz), 22, day_is_strict=False)
 
     # handlers
     for command in commands:
