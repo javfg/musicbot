@@ -1,6 +1,6 @@
 # musicbot docker-compose!
 # 2021-04-10
-version: '3.8'
+version: '3.4'
 
 services:
   musicbot:
