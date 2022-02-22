@@ -64,5 +64,5 @@ else:
     print(fg.blue + "prod env, running with healthcheck" + fg.rs)
     from musicbot.musicbot import main
 
-    run()
+    run(port=5000)
     main()

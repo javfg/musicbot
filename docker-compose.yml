@@ -10,6 +10,10 @@ services:
       context: musicbot/
       target: ${MUSICBOT_ENV:-dev}
     container_name: musicbot
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://127.0.0.1:5000/health']
+    restart: '${DOCKER_RESTART_POLICY:-unless-stopped}'
+    stop_grace_period: 3s
     env_file:
       - '.${MUSICBOT_ENV:-dev}.env'
     volumes:
