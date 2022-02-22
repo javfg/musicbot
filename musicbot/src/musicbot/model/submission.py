@@ -57,6 +57,9 @@ class Submission:
     def __str__(self) -> str:
         return f"[{self.submission_type.value}]"
 
+    def __repr__(self) -> str:
+        return f"[{self.submission_type.value}] {self.dj} {self.artist_name} - {self.album_name} - {self.track_name}"
+
     def to_md(self) -> str:
         subtitle = f"\\({_(self.submission_type.value)} sent by @{_(self.dj)}\\)"
         tags_str = ", ".join([f"{tag}" for tag in self.artist_genre_tags])

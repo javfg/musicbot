@@ -17,7 +17,7 @@ class HandleStats(Handler):
         self.handle()
 
     def handle(self) -> None:
-        results = self.db.get_submissions_for_dj(self.dj)
+        results = self.db.get_submissions_by_dj(self.dj)
         tags = [tag for result in results for tag in result.artist_genre_tags]
         fav_tags = sorted(list(Counter(tags).items()), key=lambda x: x[1], reverse=True)[: self.fav_tags_count]
         message = self.create_stats_message(results, fav_tags, len(set(tags)))

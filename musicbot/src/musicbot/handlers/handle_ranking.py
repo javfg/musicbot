@@ -5,7 +5,7 @@ from telegram.ext.callbackcontext import CallbackContext
 from telegram.update import Update
 
 from musicbot.model.handler import Handler
-from musicbot.util import _, timeframes
+from musicbot.util import _, get_timeframe
 
 
 class HandleRanking(Handler):
@@ -16,8 +16,8 @@ class HandleRanking(Handler):
         self.handle()
 
     def handle(self) -> None:
-        timeframe_start = timeframes[self.message_timeframe]()
-        results = self.db.get_submissions_since(timeframe_start)
+        timeframe_start = get_timeframe(self.message_timeframe)
+        results = self.db.get_submissions_by_date(timeframe_start)
         ranking = sorted(
             [(dj, len(list(grouper))) for dj, grouper in groupby(results, lambda x: x.dj)],
             key=lambda x: x[1],

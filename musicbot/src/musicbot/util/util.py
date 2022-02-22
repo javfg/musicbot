@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import List, Union
+from typing import List, Tuple, Union
 
 from telegram.utils.helpers import escape_markdown
 
@@ -32,21 +32,21 @@ def get_start_of_day() -> datetime:
     return datetime.now().replace(hour=0, minute=0, second=0)
 
 
-timeframes = {
-    "day": get_start_of_day,
-    "week": get_start_of_week,
-    "month": get_start_of_month,
-    "infinity": lambda: datetime(1900, 1, 1),
-}
+def get_yesterday() -> Tuple[datetime, datetime]:
+    start = datetime.now().replace(hour=5, minute=0, second=0) - timedelta(days=1)
+    end = datetime.now().replace(hour=5, minute=0, second=0)
+    return (start, end)
 
 
-def date_title(span: str) -> str:
-    if span == "day":
-        return datetime.now().strftime("%d\\-%m\\-%y")
-    if span == "week":
-        return get_start_of_week().strftime("%d\\-%m\\-%y")
-    if span == "month":
-        return datetime.now().strftime("%b")
+def get_timeframe(timeframe: str):
+    timeframes = {
+        "day": get_start_of_day,
+        "week": get_start_of_week,
+        "month": get_start_of_month,
+        "yesterday": get_yesterday,
+        "infinity": lambda: datetime(1900, 1, 1),
+    }
+    return timeframes[timeframe]()
 
 
 def split_message(message: Union[List[str], str], num_lines: int = 15) -> List[str]:

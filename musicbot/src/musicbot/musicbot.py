@@ -1,11 +1,13 @@
 import logging
 
+from datetime import time, timedelta
+
 from telegram.ext import Filters, Updater
 
 from musicbot.config import config
 from musicbot.handlers.handle_amend import HandleAmend
 from musicbot.handlers.handle_chatid import HandleChatId
-from musicbot.handlers.handle_digest import HandleDigest
+from musicbot.handlers.handle_digest import DailyDigest, HandleDigest, WeeklyDigest
 from musicbot.handlers.handle_help import HandleHelp
 from musicbot.handlers.handle_ranking import HandleRanking
 from musicbot.handlers.handle_stats import HandleStats
@@ -88,6 +90,11 @@ def main() -> None:
 
     updater = Updater(telegram_token)
     dispatcher = updater.dispatcher
+    scheduler = updater.job_queue
+
+    # schedulers (times are UTC)
+    scheduler.run_daily(DailyDigest, time(11))
+    scheduler.run_repeating(WeeklyDigest, timedelta(days=7), time(22))
 
     # handlers
     for command in commands:

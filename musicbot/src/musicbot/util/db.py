@@ -27,13 +27,14 @@ class DB:
         submissions = self.submissions_db.search(cond)
         return [Submission(**s) for s in submissions]
 
-    def get_submissions_since(self, since: datetime) -> List[Submission]:
+    def get_submissions_by_date(self, since: datetime, until: datetime = None) -> List[Submission]:
+        if not until:
+            until = datetime.now()
         q = Query()
-        timeframe_end = datetime.now()
-        submissions = self.get_submissions((q.submission_date > since) & (q.submission_date < timeframe_end))
+        submissions = self.get_submissions((q.submission_date > since) & (q.submission_date < until))
         return sorted(submissions, key=lambda x: x.dj, reverse=True)
 
-    def get_submissions_for_dj(self, dj: str) -> List[Submission]:
+    def get_submissions_by_dj(self, dj: str) -> List[Submission]:
         q = Query()
         return self.get_submissions(q.dj.test(lambda x: x.lower() == dj.lower()))
 

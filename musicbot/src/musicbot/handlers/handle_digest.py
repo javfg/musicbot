@@ -2,9 +2,10 @@ from telegram.ext.callbackcontext import CallbackContext
 from telegram.update import Update
 
 from musicbot.model.handler import Handler
+from musicbot.model.scheduler import Scheduler
 from musicbot.model.submission import Submission
-from musicbot.util import timeframes
-from musicbot.util.util import date_title, split_message
+from musicbot.util import get_timeframe, split_message
+from musicbot.util.db import DB
 
 
 class HandleDigest(Handler):
@@ -14,15 +15,41 @@ class HandleDigest(Handler):
         self.handle()
 
     def handle(self) -> None:
-        timeframe_start = timeframes[self.message_timeframe]()
-        results = self.db.get_submissions_since(timeframe_start)
-        messages = split_message(self.create_digest_message(results))
+        timeframe_start = get_timeframe(self.message_timeframe)
+        results = self.db.get_submissions_by_date(timeframe_start)
+        messages = split_message(create_digest_message(results, self.message_timeframe))
         self.send_messages(messages, disable_web_page_preview=True)
 
-    def create_digest_message(self, submissions: list[Submission]) -> str:
-        message = f"*📒 Digest for the {self.message_timeframe}* \\({date_title(self.message_timeframe)}\\):\n"
-        if not len(submissions):
-            message += "Nothing so far\\.\\.\\. 😞"
-        message += ("\n").join([s.to_inline_md() for s in submissions])
 
-        return message
+class DailyDigest(Scheduler):
+    def __init__(self, context: CallbackContext) -> None:
+        super().__init__(context)
+
+    def run(self, db: DB) -> None:
+        t_start, t_end = get_timeframe("yesterday")
+        results = db.get_submissions_by_date(t_start, t_end)
+        messages = split_message(create_digest_message(results, "yesterday"))
+        self.send_messages(messages)
+
+
+class WeeklyDigest(Scheduler):
+    def __init__(self, context: CallbackContext) -> None:
+        super().__init__(context)
+
+    def run(self, db: DB) -> None:
+        t_start = get_timeframe("week")
+        results = db.get_submissions_by_date(t_start)
+        messages = split_message(create_digest_message(results, "week"))
+        self.send_messages(messages)
+
+
+def create_digest_message(submissions: list[Submission], caption: str) -> str:
+    if caption in ["month", "week", "day"]:
+        message = f"*📒 Digest for the {caption}:*\n"
+    elif caption == "yesterday":
+        message = "*📒 Yesterday's digest:*\n"
+    if not len(submissions):
+        message += "Nothing so far\\.\\.\\. 😞"
+    message += ("\n").join([s.to_inline_md() for s in submissions])
+
+    return message
