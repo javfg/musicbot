@@ -18,7 +18,7 @@ services:
       - '.${MUSICBOT_ENV:-dev}.env'
     volumes:
       - type: bind
-        source: musicbot
+        source: ./musicbot
         target: /musicbot
       # used in dev
       # - type: bind
