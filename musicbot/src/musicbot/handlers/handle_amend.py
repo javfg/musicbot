@@ -7,7 +7,11 @@ from telegram.update import Update
 from musicbot.config import config
 from musicbot.model.handler import Handler
 from musicbot.provider import Provider
-from musicbot.util.exceptions import SpotifyEntityNotFoundException, YoutubeMetadataNotFoundException
+from musicbot.util.exceptions import (
+    FailedSubmissionNotFoundException,
+    SpotifyEntityNotFoundException,
+    YoutubeMetadataNotFoundException,
+)
 
 
 forget_about_it_msgs = ["forget about it", "forget", "olvidalo", "olvídalo", "delete", "borrar", "fuera"]
@@ -18,7 +22,11 @@ class HandleAmend(Handler):
         super().__init__(update, context)
         self.amend_message_id = update.message.reply_to_message.message_id
         self.amend_same_user = config.get("AMEND_SAME_USER", False)
-        self.failed_submission = self.db.get_failed_submission(self.amend_message_id)
+        try:
+            self.failed_submission = self.db.get_failed_submission(self.amend_message_id)
+        except FailedSubmissionNotFoundException:
+            self.logger.info(f"[chat_id: {self.chat_id} msg_id: {self.message_id}] not an ammendment message")
+            return
         self.handle()
 
     def check_amend(self) -> bool:
@@ -41,10 +49,9 @@ class HandleAmend(Handler):
             return
 
         try:
-            # content passed as both uri and title arguments, provider will figure it out
             # users some times mistakenly add a !
             amend_content = self.command[0][1:] if self.command[0][0] == "!" else self.command[0]
-            provider = Provider(amend_content, amend_content)
+            provider = Provider(amend_content)
         except (SpotifyEntityNotFoundException, YoutubeMetadataNotFoundException):
             self.not_found()
             return

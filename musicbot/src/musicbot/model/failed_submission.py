@@ -53,10 +53,8 @@ class FailedSubmission:
 
         md_string = (
             f"*❌ Youtube video* {_(self.original_uri)} *submitted by* {_(self.dj)} *has no metadata\\!*\n"
-            f"Reply to this message with either\\:\n"
-            f"• *Spotify uri\\/link*\n"
-            f"• *Artist name* and *track title* just like you would search in Spotify\n"
-            f"• You can also tell me to *forget about it*\n"
+            f"Reply to this message with the Spotify uri or link\n"
+            f"\\(You can also tell me to *forget about it*\\)\\.\n"
             f"{attempts}"
         )
 

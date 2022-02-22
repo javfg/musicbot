@@ -11,6 +11,7 @@ from tinydb_serialization.serializers import DateTimeSerializer
 
 from musicbot.model.failed_submission import FailedSubmission
 from musicbot.model.submission import Submission
+from musicbot.util.exceptions import FailedSubmissionNotFoundException
 from musicbot.util.serializers import SubmissionTypeSerializer
 
 
@@ -48,7 +49,9 @@ class DB:
 
     def get_failed_submission(self, amend_message_id: int) -> FailedSubmission:
         q = Query()
-        fs = self.failed_submissions_db.get(q.amend_message_id == amend_message_id) or {}
+        fs = self.failed_submissions_db.get(q.amend_message_id == amend_message_id)
+        if not fs:
+            raise FailedSubmissionNotFoundException
         return FailedSubmission(**fs)
 
     def remove_failed_submission(self, amend_message_id: int) -> int:

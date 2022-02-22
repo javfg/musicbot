@@ -12,3 +12,7 @@ class YoutubeMetadataNotFoundException(BaseException):
 
 class InvalidUriException(BaseException):
     pass
+
+
+class FailedSubmissionNotFoundException(BaseException):
+    pass
