@@ -16,6 +16,7 @@ services:
       - type: bind
         source: musicbot
         target: /musicbot
-      - type: bind
-        source: tools
-        target: /tools
+      # used in dev
+      # - type: bind
+      #   source: tools
+      #   target: /tools
