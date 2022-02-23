@@ -1,0 +1,10 @@
+# musicbot docker-compose override for dev!
+# 2021-04-10
+version: '3.4'
+
+services:
+  musicbot:
+    volumes:
+      - type: bind
+        source: tools
+        target: /tools

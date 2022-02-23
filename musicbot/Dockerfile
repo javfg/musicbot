@@ -1,8 +1,6 @@
 # musicbot dockerfile!
 # 2021-04-10
 
-###########################################################
-# Base container
 FROM python:3.10.2-bullseye AS base
 LABEL maintainer="Javier Ferrer <javier.f.g@um.es>"
 
@@ -19,22 +17,9 @@ RUN pip install --upgrade pip \
 COPY . .
 
 
-###########################################################
-# Dev container
-FROM base AS dev
+FROM base as run
 
 WORKDIR /musicbot
 RUN pip install --editable src/
-
-CMD ["src/start.py"]
-
-
-###########################################################
-# Prod container
-# TODO : MUST CHECK THIS
-FROM base AS prod
-
-WORKDIR /musicbot
-RUN pip install src/
 
 CMD ["src/start.py"]

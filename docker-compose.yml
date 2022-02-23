@@ -4,11 +4,7 @@ version: '3.4'
 
 services:
   musicbot:
-    build:
-      args:
-        - 'MUSICBOT_ENV=${MUSICBOT_ENV:-dev}'
-      context: musicbot/
-      target: ${MUSICBOT_ENV:-dev}
+    build: musicbot
     container_name: musicbot
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://127.0.0.1:5000/health']
@@ -20,7 +16,3 @@ services:
       - type: bind
         source: ./musicbot
         target: /musicbot
-      # used in dev
-      # - type: bind
-      #   source: tools
-      #   target: /tools
