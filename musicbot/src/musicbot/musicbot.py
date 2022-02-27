@@ -98,7 +98,7 @@ def main() -> None:
     tz = timezone("Europe/Zurich")
     scheduler.run_daily(DailyDigest, time(10, tzinfo=tz))
     scheduler.run_repeating(WeeklyDigest, timedelta(days=7), get_next_saturday())
-    scheduler.run_monthly(MonthlyRanking, time(22, 18, 40, tzinfo=tz), 22, day_is_strict=False)
+    scheduler.run_monthly(MonthlyRanking, time(22, tzinfo=tz), 31, day_is_strict=False)
 
     # handlers
     for command in commands:
