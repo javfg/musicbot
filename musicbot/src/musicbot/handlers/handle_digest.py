@@ -29,7 +29,7 @@ class DailyDigest(Scheduler):
         t_start, t_end = get_timeframe("yesterday")
         results = db.get_submissions_by_date(t_start, t_end)
         if not results:
-            self.logger.info("skipping digest, no submissions yesterday")
+            self.logger.info("skipping daily digest, no submissions yesterday")
             return
         messages = split_message(create_digest_message(results, "yesterday"))
         self.send_messages(messages)
@@ -42,6 +42,9 @@ class WeeklyDigest(Scheduler):
     def run(self, db: DB) -> None:
         t_start = get_timeframe("week")
         results = db.get_submissions_by_date(t_start)
+        if not results:
+            self.logger.info("skipping weekly digest, no submissions yesterday")
+            return
         messages = split_message(create_digest_message(results, "week"))
         self.send_messages(messages)
 
