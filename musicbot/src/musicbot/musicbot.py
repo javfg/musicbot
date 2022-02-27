@@ -16,6 +16,7 @@ from musicbot.handlers.handle_submission import HandleSubmission
 from musicbot.handlers.handle_tag import HandleTag
 from musicbot.model.command import Command
 from musicbot.util.filters import ChatIdFilter, ReplyToBotFilter
+from musicbot.util.util import get_next_saturday
 
 
 logger = logging.getLogger(__name__)
@@ -96,7 +97,7 @@ def main() -> None:
     # schedulers
     tz = timezone("Europe/Zurich")
     scheduler.run_daily(DailyDigest, time(10, tzinfo=tz))
-    scheduler.run_repeating(WeeklyDigest, timedelta(days=7), time(22, tzinfo=tz))
+    scheduler.run_repeating(WeeklyDigest, timedelta(days=7), get_next_saturday())
     scheduler.run_monthly(MonthlyRanking, time(22, 18, 40, tzinfo=tz), 22, day_is_strict=False)
 
     # handlers

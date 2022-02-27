@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from typing import List, Tuple, Union
 
+from pytz import timezone
 from telegram.utils.helpers import escape_markdown
 
 
@@ -36,6 +37,17 @@ def get_yesterday() -> Tuple[datetime, datetime]:
     start = datetime.now().replace(hour=5, minute=0, second=0) - timedelta(days=1)
     end = datetime.now().replace(hour=5, minute=0, second=0)
     return (start, end)
+
+
+def get_next_saturday(
+    hour: int = 22,
+    minute: int = 0,
+    second: int = 0,
+    tz: timezone = timezone("Europe/Zurich"),
+) -> datetime:
+    today = datetime.now(tz=tz).replace(hour=hour, minute=minute, second=second)
+    delta = timedelta((12 - today.weekday()) % 7)
+    return today + delta
 
 
 def get_timeframe(timeframe: str):
