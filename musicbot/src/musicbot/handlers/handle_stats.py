@@ -13,6 +13,8 @@ class HandleStats(Handler):
     def __init__(self, update: Update, context: CallbackContext) -> None:
         super().__init__(update, context)
         self.dj = self.command[1] or update.message.from_user.username
+        if self.dj[0] == "@":
+            self.dj = self.dj[1:]
         self.fav_tags_count = 3
         self.handle()
 

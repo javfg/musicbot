@@ -45,7 +45,7 @@ commands = [
     Command(
         "stats",
         "Shows users stats\\.",
-        Filters.regex("^!stats\\s?[A-Za-z0-9_]*$") & ChatIdFilter(),
+        Filters.regex("^!stats\\s?[@A-Za-z0-9_]*$") & ChatIdFilter(),
         HandleStats,
     ),
     Command(
