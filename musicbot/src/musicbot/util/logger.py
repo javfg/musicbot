@@ -63,7 +63,7 @@ def logger_init(bot_name):
         "backupCount": 5,
     }
 
-    log_to_file = os.getenv("LOGTOFILE").lower() not in ["false", "0"]
+    log_to_file = os.getenv("LOGTOFILE", "").lower() not in ["false", "0"]
     if os.getenv("MUSICBOT_ENV") == "prod" or log_to_file:
         LOG_SETTINGS["handlers"]["file"] = file_handler
         for logger in LOG_SETTINGS["loggers"].keys():
