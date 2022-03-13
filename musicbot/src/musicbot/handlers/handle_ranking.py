@@ -24,8 +24,8 @@ class HandleRanking(Handler):
         t_start = get_timeframe(self.message_timeframe)
         submissions = self.db.get_submissions_by_date(t_start)
         ranking = calculate_ranking(submissions)
-        messages = create_ranking_message(ranking, self.message_timeframe)
-        self.send_message(messages, disable_web_page_preview=True)
+        message = create_ranking_message(ranking, self.message_timeframe)
+        self.send_message(message, disable_web_page_preview=True)
 
 
 class MonthlyRanking(Scheduler):
@@ -36,8 +36,8 @@ class MonthlyRanking(Scheduler):
         t_start = get_timeframe("month")
         submissions = db.get_submissions_by_date(t_start)
         ranking = calculate_ranking(submissions)
-        messages = create_ranking_message(ranking, "month")
-        self.send_message(messages, disable_web_page_preview=True)
+        message = create_ranking_message(ranking, "month")
+        self.send_message(message, disable_web_page_preview=True)
 
 
 def calculate_ranking(submissions: List[Submission]):

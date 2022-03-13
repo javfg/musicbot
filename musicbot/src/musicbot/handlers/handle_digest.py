@@ -32,7 +32,7 @@ class DailyDigest(Scheduler):
             self.logger.info("skipping daily digest, no submissions yesterday")
             return
         messages = split_message(create_digest_message(results, "yesterday"))
-        self.send_messages(messages)
+        self.send_messages(messages, disable_web_page_preview=True)
 
 
 class WeeklyDigest(Scheduler):
@@ -46,7 +46,7 @@ class WeeklyDigest(Scheduler):
             self.logger.info("skipping weekly digest, no submissions yesterday")
             return
         messages = split_message(create_digest_message(results, "week"))
-        self.send_messages(messages)
+        self.send_messages(messages, disable_web_page_preview=True)
 
 
 def create_digest_message(submissions: list[Submission], caption: str) -> str:
