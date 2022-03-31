@@ -59,6 +59,12 @@ developing.
 !https://www.youtube.com/watch?v=7daW5KQZ8LE
 ```
 
+Which you can reply with:
+
+```
+https://open.spotify.com/track/0nLMjIuOsMjEq4IKuJ2twa?si=5f765bba25434b2f
+```
+
 ## Wrong YouTube video found
 
 No example of this at the moment.
