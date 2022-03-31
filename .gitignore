@@ -1,7 +1,10 @@
-# tools and db directory are not needed in the repo
-tools/
-musicbot/db/*
-musicbot/logs/*
+# jupyter stuff in tools
+tools/*.json
+tools/.ipynb_checkpoints
+
+# databases and logs
+musicbot/db
+musicbot/logs
 
 # ides
 .vscode
