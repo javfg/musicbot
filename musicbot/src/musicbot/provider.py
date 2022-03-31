@@ -36,7 +36,8 @@ class Provider:
             return None
 
         if uri_match := match(SPOTIFY_REGEX, uri):
-            self.uri = uri
+            # remove query params, we don't need them and sometimes they break spotipy
+            self.uri = uri.split("?")[0]
             self.type = SubmissionType[uri_match[2]]
             logger.info(f"valid spotify uri: [{uri}]")
         elif match(YOUTUBE_REGEX, uri):
