@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from telegram import ParseMode
 from telegram.ext.callbackcontext import CallbackContext
 from telegram.update import Update
@@ -60,7 +58,7 @@ class HandleAmend(Handler):
             self.logger.info(f"valid uri [{provider.uri}]: fetching...")
 
             try:
-                new_submission = provider.fetch(self.failed_submission.dj, datetime.now())
+                new_submission = provider.fetch(self.failed_submission.dj)
             except (SpotifyEntityNotFoundException):
                 self.not_found()
                 return

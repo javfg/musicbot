@@ -65,10 +65,9 @@ class Provider:
     def fetch(
         self,
         dj: str,
-        submission_date: Optional[datetime] = datetime.now(),
     ) -> Submission:
         fetch_strategy = self._get_fetch_strategy(self.type)
-        result = fetch_strategy(self.uri, dj, submission_date)
+        result = fetch_strategy(self.uri, dj)
         logger.info(f"success [{self.uri}]: {result}")
         return result
 
@@ -120,13 +119,12 @@ class Provider:
         self,
         artist_id: str,
         dj: str,
-        submission_date: Optional[datetime] = datetime.now(),
     ) -> Submission:
         artist_data = spotipy_provider.artist(artist_id)
 
         return Submission(
             dj,
-            submission_date,
+            datetime.now(),
             SubmissionType.artist,
             artist_name=artist_data["name"],
             artist_url=artist_data["external_urls"]["spotify"],
@@ -137,14 +135,13 @@ class Provider:
         self,
         album_id: str,
         dj: str,
-        submission_date: Optional[datetime] = datetime.now(),
     ) -> Submission:
         album_data = spotipy_provider.album(album_id)
         artist_data = spotipy_provider.artist(album_data["artists"][0]["id"])
 
         return Submission(
             dj,
-            submission_date,
+            datetime.now(),
             SubmissionType.album,
             artist_name=album_data["artists"][0]["name"],
             artist_url=album_data["artists"][0]["external_urls"]["spotify"],
@@ -158,7 +155,6 @@ class Provider:
         self,
         track_id: str,
         dj: str,
-        submission_date: datetime = datetime.now(),
     ) -> Submission:
         track_data = spotipy_provider.track(track_id)
         track_name = track_data["name"]
@@ -170,7 +166,7 @@ class Provider:
 
         return Submission(
             dj,
-            submission_date,
+            datetime.now(),
             SubmissionType.track,
             artist_name=artist_name,
             artist_url=track_data["artists"][0]["external_urls"]["spotify"],

@@ -1,7 +1,5 @@
 import logging
 
-from datetime import datetime
-
 from requests.exceptions import HTTPError
 from spotipy import SpotifyException
 from telegram.ext.callbackcontext import CallbackContext
@@ -44,7 +42,7 @@ class HandleSubmission(Handler):
             logger.info(f"valid uri [{self.message_uri}]: fetching...")
 
             try:
-                submission = provider.fetch(self.dj, datetime.now())
+                submission = provider.fetch(self.dj)
             except (SpotifyEntityNotFoundException):
                 self.not_found()
             except (SpotifyException, HTTPError, DownloadError) as error:
