@@ -26,6 +26,10 @@ spotipy_provider = Spotify(
     )
 )
 
+# create required folders for db & logs
+os.makedirs("./db", exist_ok=True)
+os.makedirs("./logs", exist_ok=True)
+
 # youtube_dl config & provider
 ydl_opts = {
     "quiet": True,

@@ -16,3 +16,4 @@ services:
       - type: bind
         source: ./musicbot
         target: /musicbot
+      - /musicbot/src/musicbot.egg-info    # make sure the egg-info is there for pip install

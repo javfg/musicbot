@@ -16,10 +16,5 @@ RUN pip install --upgrade pip \
 
 COPY . .
 
-
-FROM base as run
-
-WORKDIR /musicbot
-RUN pip install --editable src/
-
-CMD ["src/start.py"]
+RUN pip install -e src/
+CMD src/start.py
