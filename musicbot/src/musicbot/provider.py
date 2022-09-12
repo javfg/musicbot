@@ -74,9 +74,7 @@ class Provider:
     def _youtube_name_from_uri(self, uri: str) -> str:
         try:
             yt_metadata = ydl_provider.extract_info(uri, download=False)
-            artist_name = yt_metadata["artist"]
-            track_name = yt_metadata["track"]
-            video_title = f"{artist_name} {track_name}"
+            video_title = yt_metadata["title"]
 
             logger.info(f"success [{uri}]: [{video_title}]")
             return video_title
