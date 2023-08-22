@@ -12,7 +12,7 @@ from musicbot.util.util import _
 class HandleStats(Handler):
     def __init__(self, update: Update, context: CallbackContext) -> None:
         super().__init__(update, context)
-        self.dj = self.getCommandArgs(1, update.message.from_user.username)
+        self.dj = self.getCommandArg(1, update.message.from_user.username)
         if self.dj[0] == "@":
             self.dj = self.dj[1:]
         self.fav_tags_count = 3

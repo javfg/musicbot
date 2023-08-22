@@ -19,7 +19,6 @@ class HandleSubmission(Handler):
     def __init__(self, update: Update, context: CallbackContext) -> None:
         super().__init__(update, context)
         self.message_uri = self.getCommandArg(0)
-        print("SUBMISSION", self.message_uri)
         self.handle()
 
     def not_found(self) -> None:
