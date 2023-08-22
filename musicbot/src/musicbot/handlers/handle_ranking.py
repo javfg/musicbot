@@ -17,7 +17,7 @@ RANK_COUNT = 10
 class HandleRanking(Handler):
     def __init__(self, update: Update, context: CallbackContext) -> None:
         super().__init__(update, context)
-        self.message_timeframe = self.command[1] or "infinity"
+        self.message_timeframe = self.getCommandArgs(1, "infinity")
         self.handle()
 
     def handle(self) -> None:

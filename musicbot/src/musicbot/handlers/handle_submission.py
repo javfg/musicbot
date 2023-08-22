@@ -18,7 +18,8 @@ logger = logging.getLogger(__name__)
 class HandleSubmission(Handler):
     def __init__(self, update: Update, context: CallbackContext) -> None:
         super().__init__(update, context)
-        self.message_uri = self.command[0][1:]
+        self.message_uri = self.getCommandArg(0)
+        print("SUBMISSION", self.message_uri)
         self.handle()
 
     def not_found(self) -> None:
@@ -43,7 +44,7 @@ class HandleSubmission(Handler):
 
             try:
                 submission = provider.fetch(self.dj)
-            except (SpotifyEntityNotFoundException):
+            except SpotifyEntityNotFoundException:
                 self.not_found()
             except (SpotifyException, HTTPError, DownloadError) as error:
                 msg = getattr(error, "http_status", error)

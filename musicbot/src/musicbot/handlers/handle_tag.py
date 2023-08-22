@@ -13,11 +13,15 @@ MAX_TAGS_PER_REQUEST = 20
 class HandleTag(Handler):
     def __init__(self, update: Update, context: CallbackContext) -> None:
         super().__init__(update, context)
-        _, tag, limit, offset, *rest = self.command
+        tag = self.getCommandArg(1)
+        if tag is None:
+            self.send_message("You have to specify a tag\\!")
+            return
+        limit = self.getCommandArg(2, 10)
+        offset = self.getCommandArg(3, 0)
         self.tag = f"#{tag}" if tag[0] != "#" else tag
-        self.limit = min(int(limit or 10), MAX_TAGS_PER_REQUEST)
-        self.offset = int(offset or 0)
-        self.original_offset = offset
+        self.limit = min(int(limit), MAX_TAGS_PER_REQUEST)
+        self.offset = int(offset)
         self.showing_last = False
         self.handle()
 

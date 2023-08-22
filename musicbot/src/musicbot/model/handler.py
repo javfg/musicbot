@@ -16,7 +16,10 @@ class Handler(MessageActionsMixin):
         self.message_id = update.message.message_id
         self.dj = update.message.from_user.username
         self.db = db_manager.get_db(self.chat_id)
-        self.command = f"{update.message.text}      ".split(" ")
+        self.command = update.message.text[1:].lstrip().split(" ")
 
     def handle(self) -> None:
         pass
+
+    def getCommandArg(self, index: int, default: str | None = None) -> str:
+        return self.command[index] if len(self.command) > index else default

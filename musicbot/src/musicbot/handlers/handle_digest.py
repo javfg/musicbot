@@ -11,7 +11,7 @@ from musicbot.util.db import DB
 class HandleDigest(Handler):
     def __init__(self, update: Update, context: CallbackContext) -> None:
         super().__init__(update, context)
-        self.message_timeframe = self.command[1] or "week"
+        self.message_timeframe = self.getCommandArgs(1, "week")
         self.handle()
 
     def handle(self) -> None:
