@@ -1,5 +1,4 @@
 import logging
-
 from datetime import datetime
 from re import match
 from typing import Callable, Optional
@@ -96,13 +95,13 @@ class Provider:
                 self.url_youtube = f"https://youtu.be/{video_id}"
                 logger.info(f"success [{name}]: {self.url_youtube}")
         except Exception as error:
-            logger.error(f"failure [{name}]: {error.msg}")
+            logger.error(f"failure [{name}]: {error}")
 
     def _spotify_uri_from_name(self, name: str) -> Optional[str]:
         try:
             spotify_search = spotipy_provider.search(name, limit=1, type="track")
         except SpotifyException as error:
-            logger.error(f"failure [{name}]: {error.msg}")
+            logger.error(f"failure [{name}]: {error}")
             raise
 
         if not len(spotify_search["tracks"]["items"]):
