@@ -2,7 +2,6 @@ import logging
 import os
 
 import youtube_dl
-
 from spotipy import Spotify, SpotifyClientCredentials
 
 from musicbot.util.db import DBManager

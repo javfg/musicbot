@@ -59,7 +59,7 @@ class HandleAmend(Handler):
 
             try:
                 new_submission = provider.fetch(self.failed_submission.dj)
-            except (SpotifyEntityNotFoundException):
+            except SpotifyEntityNotFoundException:
                 self.not_found()
                 return
 
