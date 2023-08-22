@@ -1,5 +1,4 @@
 import logging
-
 from datetime import time, timedelta
 
 from pytz import timezone
@@ -33,19 +32,19 @@ commands = [
             "Shows a digest of the `month`, `week` or `day`\\. For example, to see the submissions  "
             "of the week, send: `\\!digest week`\\."
         ),
-        Filters.regex("^!digest\\s?(|day|week|month)$") & ChatIdFilter(),
+        Filters.regex("^!\\s*digest\\s?(|day|week|month)$") & ChatIdFilter(),
         HandleDigest,
     ),
     Command(
         "help",
         "Shows the help\\.",
-        Filters.regex("^!help$") & ChatIdFilter(),
+        Filters.regex("^!\\s*help$") & ChatIdFilter(),
         HandleHelp,
     ),
     Command(
         "stats",
         "Shows users stats\\.",
-        Filters.regex("^!stats\\s?[@A-Za-z0-9_]*$") & ChatIdFilter(),
+        Filters.regex("^!\\s*stats\\s?[@A-Za-z0-9_]*$") & ChatIdFilter(),
         HandleStats,
     ),
     Command(
@@ -54,7 +53,7 @@ commands = [
             "Shows the submission ranking for the `month`, `week` or `day`\\. For example, to see "
             "the weekly ranking, send: `\\!ranking week`\\."
         ),
-        Filters.regex("^!ranking\\s?(day|week|month)?$") & ChatIdFilter(),
+        Filters.regex("^!\\s*ranking\\s?(day|week|month)?$") & ChatIdFilter(),
         HandleRanking,
     ),
     Command(
@@ -65,19 +64,19 @@ commands = [
             "example: `\\!tag rock 5 37` will show 5 submissions with the tag `rock` starting from "
             "submission number 38\\."
         ),
-        Filters.regex("^!tag [A-Za-z0-9_#]+\\s?[0-9]*\\s?[0-9]*$") & ChatIdFilter(),
+        Filters.regex("^!\\s*tag") & ChatIdFilter(),
         HandleTag,
     ),
     Command(
         "submission",
         None,
-        Filters.regex("^!(?!amend|digest|help|stats|ranking|tag|chatid).+") & ChatIdFilter(),
+        Filters.regex("^!\\s*(?!amend|digest|help|stats|ranking|tag|chatid).+") & ChatIdFilter(),
         HandleSubmission,
     ),
     Command(
         "chatid",
         None,
-        Filters.regex("^!chatid"),
+        Filters.regex("^!\\s?chatid"),
         HandleChatId,
     ),
 ]
