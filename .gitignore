@@ -6,9 +6,6 @@ tools/.ipynb_checkpoints
 musicbot/db
 musicbot/logs
 
-# ides
-.vscode
-
 # image folder
 images
 

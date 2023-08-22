@@ -1,0 +1,24 @@
+{
+  "[python]": {
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true
+    },
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  },
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "**/.pytest_cache": true,
+  },
+  "editor.formatOnSave": true,
+  "isort.args": ["--settings-path", "${workspaceFolder}/musicbot/src/pyproject.toml"],
+  "black-formatter.args": [
+    "--line-length",
+    "120"
+  ],
+  "esbonio.sphinx.confDir": ""
+}
