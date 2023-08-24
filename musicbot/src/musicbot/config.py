@@ -1,7 +1,7 @@
 import logging
 import os
 
-import youtube_dl
+from yt_dlp import YoutubeDL
 from spotipy import Spotify, SpotifyClientCredentials
 
 from musicbot.util.db import DBManager
@@ -36,7 +36,7 @@ ydl_opts = {
     "forceid": True,
     "logger": logging.getLogger("youtube_dl"),
 }
-ydl_provider = youtube_dl.YoutubeDL(ydl_opts)
+ydl_provider = YoutubeDL(ydl_opts)
 
 # db
 db_manager = DBManager(config["VALID_CHAT_IDS"])

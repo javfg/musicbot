@@ -4,7 +4,7 @@ from requests.exceptions import HTTPError
 from spotipy import SpotifyException
 from telegram.ext.callbackcontext import CallbackContext
 from telegram.update import Update
-from youtube_dl.utils import DownloadError
+from yt_dlp.utils import DownloadError
 
 from musicbot.model.failed_submission import FailedSubmission
 from musicbot.model.handler import Handler
