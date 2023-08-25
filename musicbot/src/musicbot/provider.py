@@ -22,6 +22,7 @@ SPOTIFY_REGEX = r"^(:?spotify:|https://open\.spotify\.com/)(:?intl-[a-zA-Z]{2}/)
 YOUTUBE_REGEX = r"^https://(www\.youtube\.com/watch\?v=|youtu\.be/)(?P<id>[A-Za-z0-9_-]{11})"
 JQ_PROGRAM_TRACK = '.engagementPanels[] | select(.engagementPanelSectionListRenderer.panelIdentifier == "engagement-panel-structured-description").engagementPanelSectionListRenderer.content.structuredDescriptionContentRenderer.items[] | select(.videoDescriptionMusicSectionRenderer).videoDescriptionMusicSectionRenderer.carouselLockups[] | select(.carouselLockupRenderer).carouselLockupRenderer.infoRows[] | select(.infoRowRenderer.title.simpleText == "SONG").infoRowRenderer.defaultMetadata | if .runs != null then .runs[0].text else .simpleText end'
 JQ_PROGRAM_ARTIST = '.engagementPanels[] | select(.engagementPanelSectionListRenderer.panelIdentifier == "engagement-panel-structured-description").engagementPanelSectionListRenderer.content.structuredDescriptionContentRenderer.items[] | select(.videoDescriptionMusicSectionRenderer).videoDescriptionMusicSectionRenderer.carouselLockups[] | select(.carouselLockupRenderer).carouselLockupRenderer.infoRows[] | select(.infoRowRenderer.title.simpleText == "ARTIST").infoRowRenderer.defaultMetadata | if .runs != null then .runs[0].text else .simpleText end'
+CLEANUP_SUBSTR = [" CC", " 4K", "DNxHD"]
 
 
 class Provider:
@@ -67,6 +68,11 @@ class Provider:
         }
         return fetch_strategies[submission_type]
 
+    def _clean_youtube_metadata(self, video_title):
+        for term in CLEANUP_SUBSTR:
+            video_title = video_title.replace(term, "")
+        return video_title.rstrip()
+
     def fetch(
         self,
         dj: str,
@@ -101,7 +107,7 @@ class Provider:
                     video_title = yt_metadata["title"]
                 else:
                     logger.info("jq succeeded!")
-                    video_title = f"{artist} - {track}"
+                    video_title = self._clean_youtube_metadata(f"{artist} - {track}")
 
             logger.info(f"success [{uri}]: [{video_title}]")
             return video_title
