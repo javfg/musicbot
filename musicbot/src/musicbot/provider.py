@@ -1,8 +1,12 @@
+import json
 import logging
+import re
 from datetime import datetime
-from re import match
 from typing import Callable, Optional
 
+import bs4
+import pyjq
+import requests
 from spotipy.exceptions import SpotifyException
 
 from musicbot.config import spotipy_provider, ydl_provider
@@ -16,6 +20,8 @@ logger = logging.getLogger(__name__)
 
 SPOTIFY_REGEX = r"^(:?spotify:|https://open\.spotify\.com/)(:?intl-[a-zA-Z]{2}/)?(?P<type>track|album|artist)[:/](?P<id>[A-Za-z0-9]{22})"
 YOUTUBE_REGEX = r"^https://(www\.youtube\.com/watch\?v=|youtu\.be/)(?P<id>[A-Za-z0-9_-]{11})"
+JQ_PROGRAM_TRACK = '.engagementPanels[] | select(.engagementPanelSectionListRenderer.panelIdentifier == "engagement-panel-structured-description").engagementPanelSectionListRenderer.content.structuredDescriptionContentRenderer.items[] | select(.videoDescriptionMusicSectionRenderer).videoDescriptionMusicSectionRenderer.carouselLockups[] | select(.carouselLockupRenderer).carouselLockupRenderer.infoRows[] | select(.infoRowRenderer.title.simpleText == "SONG").infoRowRenderer.defaultMetadata | if .runs != null then .runs[0].text else .simpleText end'
+JQ_PROGRAM_ARTIST = '.engagementPanels[] | select(.engagementPanelSectionListRenderer.panelIdentifier == "engagement-panel-structured-description").engagementPanelSectionListRenderer.content.structuredDescriptionContentRenderer.items[] | select(.videoDescriptionMusicSectionRenderer).videoDescriptionMusicSectionRenderer.carouselLockups[] | select(.carouselLockupRenderer).carouselLockupRenderer.infoRows[] | select(.infoRowRenderer.title.simpleText == "ARTIST").infoRowRenderer.defaultMetadata | if .runs != null then .runs[0].text else .simpleText end'
 
 
 class Provider:
@@ -34,12 +40,12 @@ class Provider:
         if not uri and not self.title:
             return None
 
-        if uri_match := match(SPOTIFY_REGEX, uri):
+        if uri_match := re.match(SPOTIFY_REGEX, uri):
             # remove query params, we don't need them and sometimes they break spotipy
             self.uri = uri.split("?")[0]
             self.type = SubmissionType[uri_match.group("type")]
             logger.info(f"valid spotify uri: [{uri}]")
-        elif match(YOUTUBE_REGEX, uri):
+        elif re.match(YOUTUBE_REGEX, uri):
             song_name = self._youtube_name_from_uri(uri)
             self.url_youtube = uri
             self.uri = self._spotify_uri_from_name(song_name)
@@ -73,7 +79,29 @@ class Provider:
     def _youtube_name_from_uri(self, uri: str) -> str:
         try:
             yt_metadata = ydl_provider.extract_info(uri, download=False)
-            video_title = yt_metadata["title"]
+
+            if "track" in yt_metadata:
+                logger.info("track has music metadata info!")
+                track = yt_metadata.get("track")
+                artist = yt_metadata.get("artist")
+                video_title = f"{track} - {artist}"
+            else:
+                logger.info("track doesn't have music metadata, trying jq...")
+                youtube_page = requests.get(uri, headers={"Accept-Language": "en-EN"}).text
+                youtube_html = bs4.BeautifulSoup(youtube_page, features="html.parser")
+                youtube_script = youtube_html.find("script", src=False, string=re.compile("ytInitialData")).text
+                youtube_script_fixed = youtube_script.split("ytInitialData = ")[1][:-1]
+                j = json.loads(youtube_script_fixed)
+
+                track = pyjq.first(JQ_PROGRAM_TRACK, j)
+                artist = pyjq.first(JQ_PROGRAM_ARTIST, j)
+
+                if track is None or artist is None:
+                    logger.info("jq failed, falling back to video title")
+                    video_title = yt_metadata["title"]
+                else:
+                    logger.info("jq succeeded!")
+                    video_title = f"{artist} - {track}"
 
             logger.info(f"success [{uri}]: [{video_title}]")
             return video_title
