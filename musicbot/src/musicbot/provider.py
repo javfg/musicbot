@@ -14,8 +14,8 @@ from musicbot.util.exceptions import SpotifyEntityNotFoundException, YoutubeMeta
 
 logger = logging.getLogger(__name__)
 
-SPOTIFY_REGEX = r"^(spotify:|https://open\.spotify\.com/)(intl-[a-zA-Z]{2}/)?(track|album|artist)[/:][A-Za-z0-9]{22}"
-YOUTUBE_REGEX = r"^https://(www\.youtube\.com/watch\?v=|youtu\.be/)[A-Za-z0-9_-]{11}$"
+SPOTIFY_REGEX = r"^(:?spotify:|https://open\.spotify\.com/)(:?intl-[a-zA-Z]{2}/)?(?P<type>track|album|artist)[:/](?P<id>[A-Za-z0-9]{22})"
+YOUTUBE_REGEX = r"^https://(www\.youtube\.com/watch\?v=|youtu\.be/)(?P<id>[A-Za-z0-9_-]{11})"
 
 
 class Provider:
@@ -37,7 +37,7 @@ class Provider:
         if uri_match := match(SPOTIFY_REGEX, uri):
             # remove query params, we don't need them and sometimes they break spotipy
             self.uri = uri.split("?")[0]
-            self.type = SubmissionType[uri_match[2]]
+            self.type = SubmissionType[uri_match.group("type")]
             logger.info(f"valid spotify uri: [{uri}]")
         elif match(YOUTUBE_REGEX, uri):
             song_name = self._youtube_name_from_uri(uri)
