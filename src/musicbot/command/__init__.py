@@ -1,0 +1,9 @@
+from musicbot.command.amend import handle_amend as handle_amend
+from musicbot.command.digest import handle_daily_digest as handle_daily_digest
+from musicbot.command.digest import handle_weekly_digest as handle_weekly_digest
+from musicbot.command.request import handle_request as handle_request
+from musicbot.command.scrobble import handle_scrobble as handle_scrobble
+from musicbot.command.stats import handle_monthly_ranking as handle_monthly_ranking
+from musicbot.command.stats import handle_ranking as handle_ranking
+from musicbot.command.stats import handle_stats as handle_stats
+from musicbot.command.updoot import handle_updoot as handle_updoot

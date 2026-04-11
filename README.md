@@ -4,77 +4,62 @@
 
 Telegram assistant for music-related groups.
 
-![screenshot of musicbot](.github/imgs/screenshot.png)
+![screenshot of musicbot](docs/images/screenshot_2.png)
 
-# Installation
+## Installation
 
-To get an instance up and running, first you need to copy `.env.template` into `.dev.env`
-or `.prod.env` (depending on your needs), and fill the required environment variables:
+There is no package for now. To get an instance up and running, you need to clone the repository:
 
-1. Refer to the [@botfather](https://t.me/botfather) to register a bot. The `client id` and `secret`
-   go into the `TELEGRAM_CLIENT_ID` and `TELEGRAM_CLIENT_SECRET` fields.
+```bash
+git clone https://github.com/javfg/musicbot.git
+```
+
+## Configuration
+
+You need to copy `.env.template` into `.env` and fill the required environment variables:
+
+1. Refer to the [@botfather](https://t.me/botfather) to register a bot. The token you get from that
+   goes into the `MUSICBOT_BOT_TOKEN` env var.
 2. Go to the [spotify dev dashboard](https://developer.spotify.com/dashboard/applications) and
-   register a new app. The `client id` and `secret` go into the fields `SPOTIPY_CLIENT_ID` and
-   `SPOTIPY_CLIENT_SECRET`.
-3. Get the `chat id` for the chat you want `musicbot` to work on. This can be done in telegram web,
-   by heading into the chat you are interested in and looking into the browser's address bar. The
-   10 digit number after the `#` is the chat id (it should be a negative number):
+   register a new app. The `client id` and `secret` go into the fields `MUSICBOT_SPOTIFY_CLIENT_ID`
+   and `MUSICBOT_SPOTIFY_CLIENT_SECRET`.
+3. Get the `chat_id` for the chat you want to use the bot on. This goes into  `MUSICBOT_CHAT_ID_WHITELIST`.
+   You can add as many chat ids as you want, just separate them with commas. To get the `chat_id`, go
+   to telegram web, head into the chat you are interested in and look into the browser's address bar.
+   The 10 digit number after the `#` is the chat id (it should be a negative number):
+   ![chat id in telegram web](docs/images/chat_id.png)
 
-   ![chat id in telegram web](.github/imgs/chat_id.png)
 
-you can use `docker-compose`:
+## Running the bot
 
-```
-docker-compose up -d
-```
-
-It should automatically fetch all requirements and spin up the server.
-
-# examples
-
-These are some examples of URLs/URIs the bot can handle. They can serve as quick reference while
-developing.
-
-## Spotify URLs/URIs (track, album, artist)
+You can use `docker-compose`:
 
 ```
-!spotify:track:3T5th2QfWIZGot5RhBxvaT
-!spotify:album:76TPO2Tro9Z2dihxaxmxtd
-!spotify:artist:5YUQk45IjdzzQ49G1Txzkk
-!https://open.spotify.com/track/0NE9QEMV1ljhNC8WB6UqYC
-!https://open.spotify.com/album/2yCvEuVw81j9FEggmvSS5p
-!https://open.spotify.com/artist/4tZwfgrHOc3mvqYlEYSvVi
+docker compose --env-file .env up -d
 ```
 
-## Youtube URLs (long, short)
+
+or `uv`:
 
 ```
-!https://www.youtube.com/watch?v=ZIhwP0LVwgU
-!https://youtu.be/UKaoWWC9COQ
+uv run musicbot
 ```
 
-## No YouTube metadata
+Those should automatically fetch all requirements and spin up the bot.
+
+### Development
+
+For development, you can use watchfiles for hot-reloading, it is installed as a dev dependency:
 
 ```
-!https://www.youtube.com/watch?v=7daW5KQZ8LE
+uv sync --all-extras --dev
+uv run watchfiles musicbot --filter=python
 ```
 
-Which you can reply with:
 
-```
-https://open.spotify.com/track/0nLMjIuOsMjEq4IKuJ2twa?si=5f765bba25434b2f
-```
 
-## Wrong YouTube video found
+## Usage
 
-No example of this at the moment.
-
-```
-
-```
-
-## No Spotify track found
-
-```
-!https://www.youtube.com/watch?v=W7ZIz4w9Edo
-```
+Invoke the bot with `@bot_name`. Then type some song, album or artist name to trigger the search.
+You can also use `/` commands. As soon as you type a slash, the bot will show you a list of available
+commands.

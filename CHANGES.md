@@ -1,5 +1,20 @@
 # Changelog
 
+## 3.0.0
+
+*Released on April 4, 2026*
+
+* Updated to python 3.14
+* Updated to python-telegram-bot 22.7
+* Made async
+* Switched to using `uv`, `ruff` and `ty`
+* Use per-chat SQLite dbs instead of TinyDB
+* Integrated search with inline queries
+* Many more providers, not only Spotify and YouTube
+* Scrobbles now show a lot more info and links
+* You can now amend fields by replying to a scrobble
+
+
 ## 0.2.1
 
 *Released on August 22, 2023*
@@ -12,10 +27,3 @@
 ## 0.2.0
 
 * Initial public release
-
-
-# To-Do
-
-* Fix submissions for users without a telegram username
-* Add last.fm support
-t

@@ -1,0 +1,18 @@
+services:
+  musicbot:
+    build:
+      context: .
+      args:
+        UID: ${MUSICBOT_UID:-10001}
+        GID: ${MUSICBOT_GID:-10001}
+    container_name: bot-musicbot
+    ports:
+      - '${MUSICBOT_PORT:-8080}:${MUSICBOT_PORT:-8080}'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:${MUSICBOT_HEALTHCHECK_PORT:-8080}/health']
+    env_file: .env
+    volumes:
+      - ./logs:/app/logs
+      - ./data:/app/data
+    restart: unless-stopped
+    stop_grace_period: '${MUSICBOT_PROVIDER_TIMEOUT:-30}s'
