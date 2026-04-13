@@ -1,6 +1,12 @@
 # Changelog
 
 
+## 3.0.3
+
+*Released on June 13, 2026*
+* Change `/ranking` command to show all-time ranking instead of monthly (`381d8d6`)
+
+
 ## 3.0.2
 
 *Released on April 13, 2026*
