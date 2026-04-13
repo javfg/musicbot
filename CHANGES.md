@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.0.1
+
+*Released on April 13, 2026*
+
+* Fix digest links (`d9c8e5b`)
+* Amend filtering (`dd399ef`)
+
+
 ## 3.0.0
 
 *Released on April 4, 2026*
