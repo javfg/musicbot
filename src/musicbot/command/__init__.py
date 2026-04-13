@@ -2,6 +2,7 @@ from musicbot.command.amend import ReplyToBotFilter as ReplyToBotFilter
 from musicbot.command.amend import handle_amend as handle_amend
 from musicbot.command.digest import handle_daily_digest as handle_daily_digest
 from musicbot.command.digest import handle_weekly_digest as handle_weekly_digest
+from musicbot.command.help import handle_help as handle_help
 from musicbot.command.request import handle_request as handle_request
 from musicbot.command.scrobble import handle_scrobble as handle_scrobble
 from musicbot.command.stats import handle_monthly_ranking as handle_monthly_ranking

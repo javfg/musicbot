@@ -22,6 +22,7 @@ from musicbot.command import (
     ReplyToBotFilter,
     handle_amend,
     handle_daily_digest,
+    handle_help,
     handle_monthly_ranking,
     handle_ranking,
     handle_request,
@@ -79,6 +80,13 @@ class MusicBot:
 
         app.add_handler(
             CommandHandler(
+                'help',
+                callback=handle_help,
+            ),
+        )
+
+        app.add_handler(
+            CommandHandler(
                 'stats',
                 callback=handle_stats,
             ),
@@ -111,6 +119,7 @@ class MusicBot:
             )
         )
         await app.bot.set_my_commands([
+            ('help', 'Show this help message'),
             ('ranking', 'Show DJ ranking'),
             ('stats', 'Show user statistics'),
         ])

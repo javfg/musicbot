@@ -10,7 +10,7 @@ from musicbot.util import _, get_timeframe
 
 
 @secured
-async def handle_stats(update: Update, context: MusicbotContext):
+async def handle_stats(update: Update, context: MusicbotContext) -> None:
     logger.info(f'received stats command: {update}')
     if update.message is None or update.message.from_user is None:
         return
@@ -49,7 +49,7 @@ async def _handle_ranking(
     after: datetime = datetime.min,
     caption: str = 'All\\-time',
     max_results: int = 10,
-):
+) -> None:
     store = await context.get_store(chat_id)
     async with store.transaction() as conn:
         ranking = await get_ranking(
@@ -78,7 +78,7 @@ async def _handle_ranking(
 
 
 @secured
-async def handle_ranking(update: Update, context: MusicbotContext):
+async def handle_ranking(update: Update, context: MusicbotContext) -> None:
     if update.message is None:
         return
 
@@ -88,7 +88,7 @@ async def handle_ranking(update: Update, context: MusicbotContext):
     await _handle_ranking(context, chat_id, after=get_timeframe('infinite'))
 
 
-async def handle_monthly_ranking(context: MusicbotContext):
+async def handle_monthly_ranking(context: MusicbotContext) -> None:
     for chat_id in context.config.chat_id_whitelist:
         await _handle_ranking(
             context,
