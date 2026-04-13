@@ -54,7 +54,7 @@ class ScrobbleSummary:
     """The date when the scrobble was created."""
 
     def render(self) -> str:
-        short_chat_id = str(self.chat_id)
+        short_chat_id = str(self.chat_id)[4:]
         message_link = f'https://t.me/c/{short_chat_id}/{self.message_id}' if self.message_id else None
         return f'•*_{self.dj}_*:🤌{self.updoots} [🔗]({message_link}) {self.scrobble_type.emoji} {_caption(self)}'
 
