@@ -1,5 +1,14 @@
 # Changelog
 
+
+## 3.0.2
+
+*Released on April 13, 2026*
+
+* Faster migration, reuse db connection (`8fc0ef5`)
+* Fix digests breaking because of missing chat_id (`1f2545a`)
+
+
 ## 3.0.1
 
 *Released on April 13, 2026*

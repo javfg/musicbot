@@ -1,6 +1,6 @@
 [project]
 name = "musicbot"
-version = "3.0.1"
+version = "3.0.2"
 description = "Telegram assistant for music-related groups"
 readme = "README.md"
 authors = [{ name = "Javier Ferrer", email = "musicbot@meneillos.com" }]
