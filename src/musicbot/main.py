@@ -19,16 +19,17 @@ from telegram.ext import (
 )
 
 from musicbot.command import (
+    ReplyToBotFilter,
     handle_amend,
+    handle_daily_digest,
     handle_monthly_ranking,
     handle_ranking,
     handle_request,
     handle_scrobble,
     handle_stats,
     handle_updoot,
+    handle_weekly_digest,
 )
-from musicbot.command.amend import ReplyToBotFilter
-from musicbot.command.digest import handle_daily_digest, handle_weekly_digest
 from musicbot.config import Config
 from musicbot.context import MusicbotContext
 from musicbot.db.store import StoreRegistry

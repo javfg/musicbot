@@ -1,3 +1,4 @@
+from musicbot.command.amend import ReplyToBotFilter as ReplyToBotFilter
 from musicbot.command.amend import handle_amend as handle_amend
 from musicbot.command.digest import handle_daily_digest as handle_daily_digest
 from musicbot.command.digest import handle_weekly_digest as handle_weekly_digest

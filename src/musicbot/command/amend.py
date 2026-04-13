@@ -1,7 +1,7 @@
 import re
 
 from loguru import logger
-from telegram import LinkPreviewOptions, Message, Update
+from telegram import LinkPreviewOptions, Update
 from telegram.constants import ParseMode
 from telegram.ext import filters
 
@@ -9,7 +9,6 @@ from musicbot.context import MusicbotContext
 from musicbot.db.operations import update_scrobble_links
 from musicbot.model.provider import Amender
 from musicbot.security import secured
-from musicbot.util.templates import _
 
 
 class ReplyToBotFilter(filters.BaseFilter):
@@ -17,13 +16,27 @@ class ReplyToBotFilter(filters.BaseFilter):
         self.bot_id = bot_id
         super().__init__()
 
-    def filter(self, message: Message) -> bool:
-        return (
-            message.reply_to_message is not None
-            and message.reply_to_message.via_bot is not None
-            and message.reply_to_message.from_user is not None
-            and message.reply_to_message.from_user.id == self.bot_id
-        )
+    def check_update(self, update: Update) -> bool:
+        if update.message is None:
+            return False
+
+        message = update.message
+        if not message.text or not message.entities:
+            return False
+
+        urls = [e for e in message.entities if e.type in ('url', 'text_link')]
+        if not urls or len(urls) != 1 or urls[0].offset != 0 or urls[0].length != len(message.text):
+            return False
+
+        if (
+            message.reply_to_message is None
+            or message.reply_to_message.from_user is None
+            or message.reply_to_message.from_user.id != self.bot_id
+        ):
+            return False
+
+        logger.debug(f'message {message.message_id} is a valid amend request')
+        return True
 
 
 @secured
@@ -56,7 +69,7 @@ async def handle_amend(update: Update, context: MusicbotContext) -> None:
         logger.warning(f'no amender found for message {update.message.message_id} with text "{new_link}"')
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text=_('I do not know what to do with that.'),
+            text='I do not know what to do with that.',
             reply_to_message_id=update.message.message_id,
         )
         return
