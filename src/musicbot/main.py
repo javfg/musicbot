@@ -143,15 +143,14 @@ class MusicBot:
 def main() -> None:
     ver = version('musicbot')
     logger.info(f'starting musicbot v{ver}...')
-    logger.debug(f'ARGS: {sys.argv[1:]}')
+    config = Config.from_env()
 
     if sys.argv[1:] and sys.argv[1] == '--migrate':
         from musicbot.db.migration import migrate
 
-        asyncio.run(migrate())
+        asyncio.run(migrate(config))
         sys.exit(0)
 
-    config = Config.from_env()
     if config.env == 'production':
         logger.info('production instance, running with healthcheck')
         healthcheck_thread = Thread(target=start_healthcheck, args=(config,), daemon=True)

@@ -19,13 +19,15 @@ async def save_scrobble(
             artist_name, artist_type, artist_area, artist_area_born, artist_area_died,
             artist_born, artist_died, artist_thumbnail_url, artist_links,
             album_title, album_release_date, album_thumbnail_url, album_links,
-            track_title, track_release_date, track_duration, track_isrc, track_links
+            track_title, track_release_date, track_duration, track_isrc, track_links,
+            created_at
         ) VALUES (
             ?, ?, ?, ?, ?, ?,
             ?, ?, ?, ?, ?,
             ?, ?, ?, ?,
             ?, ?, ?, ?,
-            ?, ?, ?, ?, ?
+            ?, ?, ?, ?, ?,
+            ?
         )
         """,
         (
@@ -53,6 +55,7 @@ async def save_scrobble(
             scrobble.track_duration,
             scrobble.track_isrc,
             json.dumps(scrobble.track_links),
+            scrobble.created_at,
         ),
     ) as cursor:
         scrobble_id = cursor.lastrowid

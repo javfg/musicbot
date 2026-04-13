@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from datetime import date
+from datetime import date, datetime
 from enum import StrEnum
 
 from musicbot.util import _, render_links, render_tags
@@ -50,8 +50,8 @@ class ScrobbleSummary:
     """The track's title."""
     track_links: dict[str, str | None]
     """A dictionary of platform names to URLs for the track's profiles."""
-    created_at: date
-    """The date when the scrobble was created."""
+    created_at: datetime
+    """The date and time when the scrobble was created."""
 
     def render(self) -> str:
         short_chat_id = str(self.chat_id)[4:]
@@ -77,6 +77,8 @@ class Scrobble:
     """The type of the scrobble: artist, album or track."""
     updoots: int = 0
     """The number of updoots the scrobble has received."""
+    created_at: datetime = field(default_factory=datetime.now)
+    """The date when the scrobble was created."""
 
     artist_name: str = ''
     """The artist's name."""

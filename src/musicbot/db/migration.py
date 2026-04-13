@@ -1,6 +1,7 @@
 import json
-from datetime import date, datetime
+from datetime import datetime
 
+import aiosqlite
 from loguru import logger
 
 from musicbot.config import Config
@@ -16,14 +17,14 @@ DJ_IDS = {
 }
 
 
-def parse_date(value: str | None) -> date | None:
+def parse_date(value: str | None) -> datetime:
     if not value:
-        return None
+        return datetime.fromtimestamp(0)
     value = value.removeprefix('{datetimeserializer}:')
     try:
-        return datetime.fromisoformat(value).date()
+        return datetime.fromisoformat(value)
     except ValueError:
-        return None
+        return datetime.fromtimestamp(0)
 
 
 def parse_scrobble_type(value: str | None) -> ScrobbleType:
@@ -33,14 +34,9 @@ def parse_scrobble_type(value: str | None) -> ScrobbleType:
     return ScrobbleType(value)
 
 
-async def load_entry(entry: dict[str, str]) -> None:
-    config = Config.from_env()
-    store_registry = StoreRegistry.create(config)
-    store = await store_registry.get(CHAT_ID)
-
+async def load_entry(entry: dict[str, str], conn: aiosqlite.Connection, config: Config) -> None:
     dj = entry.get('dj', '')
     genres = entry.get('artist_genre_tags', [])
-
     s = Scrobble(
         id=None,
         dj=dj,
@@ -49,6 +45,7 @@ async def load_entry(entry: dict[str, str]) -> None:
         message_id=-1,
         message_content='',
         scrobble_type=parse_scrobble_type(entry.get('submission_type')),
+        created_at=parse_date(entry.get('submission_date')),
         artist_name=entry.get('artist_name', ''),
         artist_genres=[g.lstrip('#') for g in genres],
         artist_links={'spotify': entry.get('artist_url')},
@@ -61,15 +58,18 @@ async def load_entry(entry: dict[str, str]) -> None:
             'youtube': entry.get('track_url_youtube'),
         },
     )
-
-    async with store.transaction() as conn:
-        scrobble_id = await save_scrobble(conn, s)
-        logger.info(f'scrobble saved successfully with id: {scrobble_id}')
+    scrobble_id = await save_scrobble(conn, s)
+    logger.info(f'scrobble saved successfully with id: {scrobble_id}')
 
 
-async def migrate() -> None:
+async def migrate(config: Config) -> None:
+    store_registry = StoreRegistry.create(config)
+    store = await store_registry.get(CHAT_ID)
+
     with open(OLD_DB) as f:
-        data = json.load(f)
-    entries = data.get('_default', {})
-    for e in entries.values():
-        await load_entry(e)
+        async with store.transaction() as conn:
+            data = json.load(f)
+            entries = data.get('_default', {})
+            for e in entries.values():
+                await load_entry(e, conn, config)
+    await store.close()
