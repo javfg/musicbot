@@ -79,14 +79,13 @@ async def _handle_ranking(
 
 @secured
 async def handle_ranking(update: Update, context: MusicbotContext):
-    logger.info(f'received ranking command: {update}')
     if update.message is None:
         return
 
     chat_id = update.message.chat_id
     logger.info(f'handling ranking command in chat {chat_id}')
 
-    await _handle_ranking(context, chat_id, after=get_timeframe('month'))
+    await _handle_ranking(context, chat_id, after=get_timeframe('infinite'))
 
 
 async def handle_monthly_ranking(context: MusicbotContext):
