@@ -1,6 +1,13 @@
 # Changelog
 
 
+## 3.0.4
+
+*Released on June 13, 2026*
+
+* Add `/help` command to show usage instructions (`351119f`)
+
+
 ## 3.0.3
 
 *Released on June 13, 2026*
