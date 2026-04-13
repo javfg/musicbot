@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.5
+
+*Released on June 13, 2026*
+
+* Fix musicbrainz album link (`2b3ee4f`)
+
 
 ## 3.0.4
 
