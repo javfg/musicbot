@@ -129,7 +129,7 @@ class MusicbrainzProvider(SearchableProvider):
     ) -> Scrobble:
         scrobble.fill_field('album_title', data['title'])
         scrobble.fill_field('album_release_date', date_from_iso(data.get('first-release-date')))
-        scrobble.add_album_link('musicbrainz', f'https://musicbrainz.org/release/{data["id"]}')
+        scrobble.add_album_link('musicbrainz', f'https://musicbrainz.org/release-group/{data["id"]}')
         scrobble.fill_field('album_genres', self._get_tags(data.get('tags', [])))
 
         artist_mbid = data.get('artist-credit', [{}])[0].get('artist', {}).get('id')
