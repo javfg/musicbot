@@ -56,7 +56,9 @@ class ScrobbleSummary:
     def render(self) -> str:
         short_chat_id = str(self.chat_id)[4:]
         message_link = f'https://t.me/c/{short_chat_id}/{self.message_id}' if self.message_id else None
-        return f'•*_{self.dj}_*:🤌{self.updoots} [🔗]({message_link}) {self.scrobble_type.emoji} {_caption(self)}'
+        updoots_part = f'`🤌{str(self.updoots).ljust(3)}`'
+        link_part = f'[🔗]({message_link})'
+        return f'• {link_part} {updoots_part} *_{self.dj}_*: {self.scrobble_type.emoji} {_caption(self)}'
 
 
 @dataclass

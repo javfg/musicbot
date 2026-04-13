@@ -50,7 +50,7 @@ async def _handle_ranking(
     caption: str = 'All\\-time',
     max_results: int = 10,
 ):
-    store = await context.get_store()
+    store = await context.get_store(chat_id)
     async with store.transaction() as conn:
         ranking = await get_ranking(
             conn,
