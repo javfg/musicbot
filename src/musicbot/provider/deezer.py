@@ -2,7 +2,7 @@ import httpx
 from loguru import logger
 
 from musicbot.config import Config
-from musicbot.model.provider import ProviderRegistry, SearchableProvider
+from musicbot.model.provider import Amender, ProviderRegistry, SearchableProvider
 from musicbot.model.request import Request
 from musicbot.model.scrobble import Scrobble, ScrobbleType
 from musicbot.util.date import date_from_iso
@@ -11,8 +11,24 @@ from musicbot.util.date import date_from_iso
 class DeezerProvider(SearchableProvider):
     name = 'deezer'
     weight = 50
-    routes = [r'https?://(?:www\.)?(?:deezer\.com/)(track|album|artist)/\d+']
-    amenders = []
+    routes = [r'https?://(?:www\.)?deezer\.com/(?:[a-z]{2}/)?(track|album|artist)/\d+']
+    amenders = [
+        Amender(
+            pattern=r'https?://(?:www\.)?deezer\.com/(?:[a-z]{2}/)?track/(?P<id>\d+)',
+            link_type=ScrobbleType.TRACK,
+            link_key='deezer',
+        ),
+        Amender(
+            pattern=r'https?://(?:www\.)?deezer\.com/(?:[a-z]{2}/)?album/(?P<id>\d+)',
+            link_type=ScrobbleType.ALBUM,
+            link_key='deezer',
+        ),
+        Amender(
+            pattern=r'https?://(?:www\.)?deezer\.com/(?:[a-z]{2}/)?artist/(?P<id>\d+)',
+            link_type=ScrobbleType.ARTIST,
+            link_key='deezer',
+        ),
+    ]
 
     def __init__(
         self,
