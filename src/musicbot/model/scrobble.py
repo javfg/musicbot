@@ -148,7 +148,13 @@ class Scrobble:
 
     @property
     def search_query(self) -> str:
-        return f'{self.artist_name} {self.album_title or self.track_title}'
+        match self.scrobble_type:
+            case ScrobbleType.ARTIST:
+                return self.artist_name
+            case ScrobbleType.ALBUM:
+                return f'{self.artist_name} - {self.album_title}'
+            case ScrobbleType.TRACK:
+                return f'{self.artist_name} {self.album_title or ""} {self.track_title or ""}'.strip()
 
     @property
     def links(self) -> dict[str, str]:

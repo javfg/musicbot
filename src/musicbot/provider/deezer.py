@@ -96,7 +96,7 @@ class DeezerProvider(SearchableProvider):
     async def fill(self, scrobble: Scrobble, provider_id: str | None) -> Scrobble:
         # if there is no provider id, try to search
         if not provider_id:
-            results = await self.search(query=scrobble.search_query, limit=1)
+            results = await self.search(query=scrobble.search_query, limit=25)
             if not results:
                 logger.debug(f'no results found for query: {scrobble.search_query}')
                 return scrobble
@@ -105,6 +105,20 @@ class DeezerProvider(SearchableProvider):
                 logger.debug(f'no results found for query: {scrobble.search_query}')
                 return scrobble
             provider_id = filtered[0].provider_id
+            for result in filtered:
+                match scrobble.scrobble_type:
+                    case ScrobbleType.ARTIST:
+                        if result.caption.lower() == scrobble.artist_name.lower():
+                            provider_id = result.provider_id
+                            break
+                    case ScrobbleType.ALBUM:
+                        if result.caption.lower() == f'{scrobble.artist_name.lower()} - {scrobble.album_title.lower()}':
+                            provider_id = result.provider_id
+                            break
+                    case ScrobbleType.TRACK:
+                        if result.caption.lower() == f'{scrobble.artist_name.lower()} - {scrobble.track_title.lower()}':
+                            provider_id = result.provider_id
+                            break
             logger.debug(f'found provider id {provider_id} for query: {scrobble.search_query}')
 
         # get the content
