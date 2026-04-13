@@ -25,7 +25,7 @@ async def handle_help(update: Update, context: MusicbotContext) -> None:
             "Just *pick one* of the suggestions and I'll do the rest\\.\n\n"
             "You can also put a *YouTube* or *Spotify* link in there and I'll figure things out\\. Most of the time\\."
             '\n\n'
-            '*If I mess things up*, you can correct me by replying to my message with the correct spotify, youtube'
+            '*If I mess things up*, you can correct me by replying to my message with the correct spotify, youtube '
             "or wikipedia links and I'll fix them for you in your scrobble\\."
             '\n\n'
             "I can do some other stuff, you can see it by writing `/` in the message box and I'll show you a list"
