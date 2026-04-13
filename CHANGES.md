@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.0.6
+*Released on June 14, 2026*
+
+* Improved Deezer fill accuracy, matching on a list of candidates (`eeee5c6`)
+* Add basic Deezer amenders for artists, albums and tracks (`b18c098`)
+
+
 ## 3.0.5
 
 *Released on June 13, 2026*
