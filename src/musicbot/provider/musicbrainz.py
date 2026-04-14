@@ -253,7 +253,13 @@ class MusicbrainzProvider(SearchableProvider):
                     releases = release_data.get('releases', [])
                     if not releases:
                         logger.debug('no releases found')
-                        return scrobble
+                        query = f'artist:{scrobble.artist_name} AND release_group:{scrobble.album_title}'
+                        logger.debug(f'searching for release with query: {query}')
+                        release_data = await self._search('/release', query, limit=25)
+                        releases = release_data.get('releases', [])
+                        if not releases:
+                            logger.debug('no releases found')
+                            return scrobble
                     release_index = 0
                     for index, release in enumerate(releases):
                         if clean(release['title']) == clean(scrobble.album_title):
