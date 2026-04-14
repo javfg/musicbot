@@ -54,6 +54,7 @@ class MusicbrainzProvider(SearchableProvider):
         query: str,
         limit: int | None = 1,
     ) -> dict[str, Any]:
+        logger.debug(f'making request to {self.client.base_url}{endpoint}?{query}&fmt=json&limit={limit}')
         request = await self.client.get(
             endpoint,
             params={
@@ -226,7 +227,7 @@ class MusicbrainzProvider(SearchableProvider):
                     logger.debug(f'filled artist data from musicbrainz for artist: {scrobble.artist_name}')
                 else:
                     logger.debug(f'searching for artist with query: {scrobble.artist_name}')
-                    artist_data = await self._search('/artist', f'artist:{scrobble.artist_name}', limit=25)
+                    artist_data = await self._search('artist', f'artist:{scrobble.artist_name}', limit=25)
                     artists = artist_data.get('artists', [])
                     if not artists:
                         logger.debug('no artists found')
@@ -249,13 +250,12 @@ class MusicbrainzProvider(SearchableProvider):
                     year = f' AND date:{scrobble.album_release_date.year}' if scrobble.album_release_date else ''
                     query = f'artist:{scrobble.artist_name} AND release_group:{scrobble.album_title}{year}'
                     logger.debug(f'searching for release with query: {query}')
-                    release_data = await self._search('/release', query, limit=25)
+                    release_data = await self._search('release', query, limit=25)
                     releases = release_data.get('releases', [])
                     if not releases:
-                        logger.debug('no releases found')
+                        logger.debug(f'no releases found, try again excluding year: {query}')
                         query = f'artist:{scrobble.artist_name} AND release_group:{scrobble.album_title}'
-                        logger.debug(f'searching for release with query: {query}')
-                        release_data = await self._search('/release', query, limit=25)
+                        release_data = await self._search('release', query, limit=25)
                         releases = release_data.get('releases', [])
                         if not releases:
                             logger.debug('no releases found')
@@ -266,7 +266,12 @@ class MusicbrainzProvider(SearchableProvider):
                             logger.debug(f'found good match release with mbid: {release["id"]}')
                             release_index = index
                             break
-                    scrobble = await self._fill_album(scrobble, release_data['releases'][release_index])
+                    release_group_data = await self._get(
+                        ScrobbleType.ALBUM,
+                        releases[release_index]['release-group']['id'],
+                        inc='tags+artist-credits',
+                    )
+                    scrobble = await self._fill_album(scrobble, release_group_data)
                     logger.info(f'filled album data from musicbrainz for album: {scrobble.album_title}')
                 return scrobble
 
@@ -284,7 +289,7 @@ class MusicbrainzProvider(SearchableProvider):
                     tt = f'recording:{scrobble.track_title}' if scrobble.track_title else ''
                     query = ' AND '.join(filter(None, [an, at, tt]))
                     logger.debug(f'searching for recording with query: {query}')
-                    recording_data = await self._search('/recording', query, limit=25)
+                    recording_data = await self._search('recording', query, limit=25)
                     recordings = recording_data.get('recordings', [])
                     if not recordings:
                         logger.debug('no recordings found')
