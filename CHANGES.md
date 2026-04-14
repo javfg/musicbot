@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.0.7
+*Released on June 14, 2026*
+
+* Make the MusicBrainz album fill more lenient, falling back to a query without
+  the year if the initial search fails (`8b4e3bb`)
+* Add links like https://open.spotify.com/intl-es/album/2JOhTLLfVCTtfKta6Sy5MB
+  (with the `/intl-??` part) to the Spotify regexes (`bbf169f`)
+* Ensure search goes up to a release group in MusicBrainz, not just a release,
+  so we don't end up without tags and broken links (`dea42f5`)
+
+
 ## 3.0.6
 *Released on June 14, 2026*
 
