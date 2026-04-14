@@ -17,21 +17,21 @@ class SpotifyProvider(SearchableProvider):
     name = 'spotify'
     weight = 30
     routes = [
-        r'https?://open\.spotify\.com/(?P<type>track|album|artist)/(?P<id>[\w]+)',
+        r'https?://open\.spotify\.com/(?:intl-[a-z]+/)?(?P<type>track|album|artist)/(?P<id>[\w]+)',
     ]
     amenders = [
         Amender(
-            pattern=r'https?://open\.spotify\.com/track/(?P<id>[\w]+)',
+            pattern=r'https?://open\.spotify\.com/(?:intl-[a-z]+/)?track/(?P<id>[\w]+)',
             link_type=ScrobbleType.TRACK,
             link_key='spotify',
         ),
         Amender(
-            pattern=r'https?://open\.spotify\.com/album/(?P<id>[\w]+)',
+            pattern=r'https?://open\.spotify\.com/(?:intl-[a-z]+/)?album/(?P<id>[\w]+)',
             link_type=ScrobbleType.ALBUM,
             link_key='spotify',
         ),
         Amender(
-            pattern=r'https?://open\.spotify\.com/artist/(?P<id>[\w]+)',
+            pattern=r'https?://open\.spotify\.com/(?:intl-[a-z]+/)?artist/(?P<id>[\w]+)',
             link_type=ScrobbleType.ARTIST,
             link_key='spotify',
         ),
