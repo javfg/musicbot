@@ -10,6 +10,7 @@ from musicbot.config import PROVIDER_CACHE_SIZE, PROVIDER_CACHE_TTL, Config
 from musicbot.model.provider import Amender, Provider, SearchableProvider
 from musicbot.model.request import Request
 from musicbot.model.scrobble import Scrobble, ScrobbleType
+from musicbot.util.date import date_from_iso
 
 
 class SpotifyProvider(SearchableProvider):
@@ -129,7 +130,7 @@ class SpotifyProvider(SearchableProvider):
 
     def _fill_album(self, scrobble: Scrobble, album: Album) -> Scrobble:
         scrobble.fill_field('album_title', album.name)
-        scrobble.fill_field('album_release_date', album.release_date)
+        scrobble.fill_field('album_release_date', date_from_iso(album.release_date))
         scrobble.fill_field('album_thumbnail_url', self._get_image_url(album))
         scrobble.add_album_link('spotify', album.external_urls.spotify)
         return scrobble
