@@ -6,7 +6,7 @@ import httpx
 from loguru import logger
 
 from musicbot.config import Config
-from musicbot.model.provider import ProviderRegistry, SearchableProvider
+from musicbot.model.provider import Amender, ProviderRegistry, SearchableProvider
 from musicbot.model.request import Request
 from musicbot.model.scrobble import ArtistType, Scrobble, ScrobbleType
 from musicbot.util import clean, date_from_iso
@@ -18,7 +18,23 @@ class MusicbrainzProvider(SearchableProvider):
     name = 'musicbrainz'
     weight = 40
     routes = [r'^https?://(?:www\.)?musicbrainz\.org/(release|artist)/[0-9a-f-]{32,36}$']
-    amenders = []
+    amenders = [
+        Amender(
+            pattern=r'^https?://(?:www\.)?musicbrainz\.org/artist/(?P<id>[0-9a-f-]{32,36})$',
+            link_type=ScrobbleType.ARTIST,
+            link_key='musicbrainz',
+        ),
+        Amender(
+            pattern=r'^https?://(?:www\.)?musicbrainz\.org/release-group/(?P<id>[0-9a-f-]{32,36})$',
+            link_type=ScrobbleType.ALBUM,
+            link_key='musicbrainz',
+        ),
+        Amender(
+            pattern=r'^https?://(?:www\.)?musicbrainz\.org/recording/(?P<id>[0-9a-f-]{32,36})$',
+            link_type=ScrobbleType.TRACK,
+            link_key='musicbrainz',
+        ),
+    ]
 
     def __init__(
         self,
@@ -54,7 +70,7 @@ class MusicbrainzProvider(SearchableProvider):
         query: str,
         limit: int | None = 1,
     ) -> dict[str, Any]:
-        logger.debug(f'making request to {self.client.base_url}{endpoint}?{query}&fmt=json&limit={limit}')
+        logger.debug(f'making request to {self.client.base_url}{endpoint}?query={query}&fmt=json&limit={limit}')
         request = await self.client.get(
             endpoint,
             params={
