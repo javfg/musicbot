@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.0.8
+*Released on June 15, 2026*
+
+* Add basic MusicBrainz amenders for artists, albums and tracks (`68db30e`)
+* Message early if an user attempts to amend a scrobble that he didn't submit
+  himself. Do this in a DM to the user so the chat doesn't get spammed (`c261e1e`)
+
 ## 3.0.7
 *Released on June 14, 2026*
 
