@@ -153,6 +153,28 @@ async def update_scrobble_links(
     return old_link_value, new_link_value
 
 
+async def check_amend_request(
+    conn: aiosqlite.Connection,
+    message_id: int,
+    amender_user_id: int,
+) -> None:
+    """Check if the amend request is valid."""
+    async with conn.execute(
+        'SELECT dj_id FROM scrobbles WHERE message_id = ?',
+        (message_id,),
+    ) as cursor:
+        row = await cursor.fetchone()
+
+    if row is None:
+        logger.warning(f'amend request for message_id {message_id} failed: scrobble not found')
+        raise ValueError('scrobble not found for message_id: ' + str(message_id))
+
+    dj_id = row[0]
+    if dj_id != amender_user_id:
+        logger.warning(f'amend {message_id}: amender ({amender_user_id}) is not dj ({dj_id})')
+        raise PermissionError('only the original submitter can amend the scrobble links')
+
+
 async def get_ranking(
     conn: aiosqlite.Connection,
     chat_id: int,

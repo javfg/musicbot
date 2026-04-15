@@ -6,7 +6,7 @@ from telegram.constants import ParseMode
 from telegram.ext import filters
 
 from musicbot.context import MusicbotContext
-from musicbot.db.operations import update_scrobble_links
+from musicbot.db.operations import check_amend_request, update_scrobble_links
 from musicbot.model.provider import Amender
 from musicbot.security import secured
 
@@ -57,7 +57,23 @@ async def handle_amend(update: Update, context: MusicbotContext) -> None:
     new_link = update.message.text
     logger.debug(f'user {amender_user_id} request amend {scrobble_message.message_id} with new link: {new_link}')
 
-    # first find the correct amendment for the given reply
+    # first check if the amend request is valid
+    store = await context.get_store()
+    async with store.transaction() as conn:
+        try:
+            await check_amend_request(conn, scrobble_message.message_id, amender_user_id)
+        except PermissionError:
+            chat_id = update.message.chat_id
+            message_id = scrobble_message.message_id
+            link = f'https://t.me/c/{str(chat_id)[4:]}/{message_id}'
+            await context.bot.send_message(
+                amender_user_id,
+                f'Regarding:\n\n{link}\n\nOnly the original submitter can amend the scrobble links.',
+            )
+            await update.message.delete()
+            return
+
+    # then find the correct amendment for the given reply
     correct_amender: Amender | None = None
     for amender in context.provider_registry.amenders:
         if re.match(amender.pattern, new_link):
