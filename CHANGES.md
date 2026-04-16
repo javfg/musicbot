@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.9
+*Released on June 16, 2026*
+
+* Add Genius as a lyrics provider, along with an amender for it (`51d4d7e`)
+
+
 ## 3.0.8
 *Released on June 15, 2026*
 
