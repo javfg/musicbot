@@ -96,6 +96,7 @@ class Config:
         self.extra = {
             'spotify_client_id': must_str('MUSICBOT_SPOTIFY_CLIENT_ID'),
             'spotify_client_secret': must_str('MUSICBOT_SPOTIFY_CLIENT_SECRET'),
+            'genius_access_token': must_str('MUSICBOT_GENIUS_ACCESS_TOKEN'),
         }
 
         logger.info('config parsed successfully')

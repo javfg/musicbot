@@ -34,7 +34,10 @@ You need to copy `.env.template` into `.env` and fill the required environment v
 2. Go to the [spotify dev dashboard](https://developer.spotify.com/dashboard/applications) and
    register a new app. The `client id` and `secret` go into the fields `MUSICBOT_SPOTIFY_CLIENT_ID`
    and `MUSICBOT_SPOTIFY_CLIENT_SECRET`.
-3. Get the `chat_id` for the group you want to use the bot on. This goes into `MUSICBOT_CHAT_ID_WHITELIST`.
+3. Go to the [genius api clients](https://genius.com/api-clients) and register a new client. Then click
+   "Generate Access Token" underneath the "CLIENT ID" and "CLIENT SECRET" fields. The generated token
+   goes into `MUSICBOT_GENIUS_ACCESS_TOKEN`.
+4. Get the `chat_id` for the group you want to use the bot on. This goes into `MUSICBOT_CHAT_ID_WHITELIST`.
    You can add as many chat ids as you want, just separate them with commas. To get the `chat_id`, go
    to telegram web, head into the chat you are interested in and look into the browser's address bar.
    The 10 digit number after the `#` is the chat id (it should be a negative number):
