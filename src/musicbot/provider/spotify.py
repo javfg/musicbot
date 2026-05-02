@@ -81,12 +81,12 @@ class SpotifyProvider(SearchableProvider):
     async def search(self, query: str, limit: int | None = 5) -> list[Request]:
         # first we try to match the query to a spotify link
         results = []
-        match = re.match(self.routes[0], query)
+        m = re.match(self.routes[0], query)
 
         # if match, use the id to get the resource from spotify directly
-        if match:
-            request_type = ScrobbleType(match.group('type'))
-            request_id = match.group('id')
+        if m:
+            request_type = ScrobbleType(m.group('type'))
+            request_id = m.group('id')
             logger.debug(f'extracted spotify id: {request_id} and type: {request_type}')
             results = [await self._get(request_id, request_type)]
         # otherwise, search spotify and get some results

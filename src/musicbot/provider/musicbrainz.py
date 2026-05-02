@@ -3,6 +3,7 @@ import re
 from typing import Any
 
 import httpx
+from httpx_retries import Retry, RetryTransport
 from loguru import logger
 
 from musicbot.config import Config
@@ -17,7 +18,9 @@ PAUSE_BETWEEN_QUERIES = 0.75
 class MusicbrainzProvider(SearchableProvider):
     name = 'musicbrainz'
     weight = 40
-    routes = [r'^https?://(?:www\.)?musicbrainz\.org/(release|artist)/[0-9a-f-]{32,36}$']
+    routes = [
+        r'^https?://(?:www\.)?musicbrainz\.org/(?P<type>release|release-group|artist|recording)/(?P<id>[0-9a-f-]{32,36})'
+    ]
     amenders = [
         Amender(
             pattern=r'^https?://(?:www\.)?musicbrainz\.org/artist/(?P<id>[0-9a-f-]{32,36})$',
@@ -42,10 +45,18 @@ class MusicbrainzProvider(SearchableProvider):
         provider_registry: ProviderRegistry,
         config: Config,
     ) -> None:
+        retry = Retry(
+            total=5,
+            backoff_factor=0.5,
+            status_forcelist=[404, 429, 500, 502, 503, 504],
+            allowed_methods=['GET'],
+            respect_retry_after_header=True,
+        )
         self.client = httpx.AsyncClient(
             base_url='https://musicbrainz.org/ws/2',
             headers={'User-Agent': config.user_agent},
             timeout=config.provider_timeout,
+            transport=RetryTransport(retry=retry),
         )
 
     def _get_tags(
@@ -87,7 +98,7 @@ class MusicbrainzProvider(SearchableProvider):
 
     async def _get(
         self,
-        scrobble_type: ScrobbleType,
+        scrobble_type: ScrobbleType | str,
         mbid: str,
         limit: int = 1,
         inc: str = '',
@@ -97,7 +108,10 @@ class MusicbrainzProvider(SearchableProvider):
             ScrobbleType.ALBUM: 'release-group',
             ScrobbleType.TRACK: 'recording',
         }
-        endpoint = scrobble_type_to_endpoint[scrobble_type]
+        if isinstance(scrobble_type, ScrobbleType):
+            endpoint = scrobble_type_to_endpoint[scrobble_type]
+        else:
+            endpoint = scrobble_type
 
         logger.debug(f'making request to {self.client.base_url}{endpoint}/{mbid}?fmt=json&limit={limit}&inc={inc}')
         request = await self.client.get(
@@ -175,59 +189,93 @@ class MusicbrainzProvider(SearchableProvider):
         return scrobble
 
     async def search(self, query: str, limit: int | None = 25) -> list[Request]:
-        query = query.strip().replace(' ', ' AND ')
-        logger.debug(f'searching for query "{query}" in Musicbrainz')
-        artists_request = await self._search('/artist', f'{query}', limit=limit)
-        artists = artists_request.get('artists', [])
-        await asyncio.sleep(PAUSE_BETWEEN_QUERIES)
-        release_groups_request = await self._search('/release-group', f'{query}', limit=limit)
-        release_groups = release_groups_request.get('release-groups', [])
-        await asyncio.sleep(PAUSE_BETWEEN_QUERIES)
-        recordings_request = await self._search('/recording', f'{query}', limit=limit)
-        recordings = recordings_request.get('recordings', [])
-
         results = []
+        m = re.match(self.routes[0], query)
 
-        logger.debug(f'got {len(artists)} artists')
-        for artist in artists:
-            caption = artist['name']
-            request = Request(
-                provider_name=self.name,
-                provider_id=artist['id'],
-                result_type=ScrobbleType.ARTIST,
-                caption=caption,
-                thumbnail_url=None,
-            )
-            results.append(request)
+        if m:
+            logger.debug(f'found musicbrainz link in query: {query}')
+            mbid = m.group('id')
+            match m.group('type'):
+                case 'release':
+                    data = await self._get('release', mbid, inc='release-groups')
+                    mbid = data.get('release-group', {}).get('id', mbid)
+                    request_type = ScrobbleType.ALBUM
+                    logger.debug(f'user sent release mbid {mbid}, found release-group {mbid}')
+                case 'release-group':
+                    request_type = ScrobbleType.ALBUM
+                case 'artist':
+                    request_type = ScrobbleType.ARTIST
+                case 'recording':
+                    request_type = ScrobbleType.TRACK
+            logger.debug(f'extracted musicbrainz id: {mbid} and type: {request_type}')
+            data = await self._get(request_type, mbid)
+            return [
+                Request(
+                    provider_name=self.name,
+                    provider_id=mbid,
+                    result_type=request_type if request_type != 'release' else ScrobbleType.ALBUM,
+                    caption=data['title'] if request_type != ScrobbleType.ARTIST else data['name'],
+                    thumbnail_url=None,
+                )
+            ]
 
-        logger.debug(f'got {len(release_groups)} release groups')
-        for release_group in release_groups:
-            artist_name = release_group['artist-credit'][0]['artist']['name']
-            caption = f'{artist_name} - {release_group["title"]}'
-            request = Request(
-                provider_name=self.name,
-                provider_id=release_group['id'],
-                result_type=ScrobbleType.ALBUM,
-                caption=caption,
-                thumbnail_url=None,
-            )
-            results.append(request)
-        logger.debug(f'got {len(recordings)} recordings')
-        for recording in recordings:
-            artist_name = recording['artist-credit'][0]['artist']['name']
-            album_title = recording['releases'][0]['title'] if recording.get('releases') else ''
-            caption = f'{recording["artist-credit"][0]["artist"]["name"]} - {recording["title"]}'
-            if album_title:
-                caption += f' ({album_title})'
-            request = Request(
-                provider_name=self.name,
-                provider_id=recording['id'],
-                result_type=ScrobbleType.TRACK,
-                caption=caption,
-                thumbnail_url=None,
-            )
-            results.append(request)
-        logger.info(f'musicbrainz search "{query}": {len(results)} results')
+        else:
+            query = query.strip().replace(' ', ' AND ')
+
+            logger.debug(f'searching for query "{query}" in Musicbrainz')
+            artists_request = await self._search('/artist', f'{query}', limit=limit)
+            artists = artists_request.get('artists', [])
+
+            await asyncio.sleep(PAUSE_BETWEEN_QUERIES)
+            release_groups_request = await self._search('/release-group', f'{query}', limit=limit)
+            release_groups = release_groups_request.get('release-groups', [])
+
+            await asyncio.sleep(PAUSE_BETWEEN_QUERIES)
+            recordings_request = await self._search('/recording', f'{query}', limit=limit)
+            recordings = recordings_request.get('recordings', [])
+
+            logger.debug(f'got {len(artists)} artists')
+            for artist in artists:
+                caption = artist['name']
+                request = Request(
+                    provider_name=self.name,
+                    provider_id=artist['id'],
+                    result_type=ScrobbleType.ARTIST,
+                    caption=caption,
+                    thumbnail_url=None,
+                )
+                results.append(request)
+
+            logger.debug(f'got {len(release_groups)} release groups')
+            for release_group in release_groups:
+                artist_name = release_group['artist-credit'][0]['artist']['name']
+                caption = f'{artist_name} - {release_group["title"]}'
+                request = Request(
+                    provider_name=self.name,
+                    provider_id=release_group['id'],
+                    result_type=ScrobbleType.ALBUM,
+                    caption=caption,
+                    thumbnail_url=None,
+                )
+                results.append(request)
+            logger.debug(f'got {len(recordings)} recordings')
+
+            for recording in recordings:
+                artist_name = recording['artist-credit'][0]['artist']['name']
+                album_title = recording['releases'][0]['title'] if recording.get('releases') else ''
+                caption = f'{recording["artist-credit"][0]["artist"]["name"]} - {recording["title"]}'
+                if album_title:
+                    caption += f' ({album_title})'
+                request = Request(
+                    provider_name=self.name,
+                    provider_id=recording['id'],
+                    result_type=ScrobbleType.TRACK,
+                    caption=caption,
+                    thumbnail_url=None,
+                )
+                results.append(request)
+            logger.info(f'musicbrainz search "{query}": {len(results)} results')
+
         return results
 
     async def fill(
