@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.0.11
+*Released on May 3, 2026*
+
+* Improved the Spotify matching so it can find the correct artist/album/track out
+  of a list of candidates, instead of choosing the first one (`f6eb1d8`)
+
+
 ## 3.0.10
 *Released on May 2, 2026*
 
