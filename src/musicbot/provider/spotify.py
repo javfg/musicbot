@@ -143,18 +143,44 @@ class SpotifyProvider(SearchableProvider):
         scrobble.add_track_link('spotify', track.external_urls.spotify)
         return scrobble
 
+    def _match(self, scrobble: Scrobble, results: list[Artist | Album | Track]) -> Artist | Album | Track:
+        match scrobble.scrobble_type:
+            case ScrobbleType.ARTIST:
+                for result in results:
+                    if result.name.lower() == scrobble.artist_name.lower():
+                        return result
+            case ScrobbleType.ALBUM:
+                for result in results:
+                    if result.name.lower() == scrobble.album_title.lower():
+                        return result
+            case ScrobbleType.TRACK:
+                for result in results:
+                    if result.name.lower() == scrobble.track_title.lower():
+                        return result
+        return results[0]
+
     async def fill(self, scrobble: Scrobble, provider_id: str | None) -> Scrobble:
         # if there is no provider id, try to search
         result: Album | Artist | Track
         if not provider_id:
-            q = f'{scrobble.album_title} {scrobble.artist_name} {scrobble.track_title}'
-            logger.debug(f'searching spotify for query: {q} type {scrobble.scrobble_type.value}')
-            data = await self.client.search.search(q=q, types=[scrobble.scrobble_type.value], limit=1)
+            an = scrobble.artist_name.replace(' ', '+')
+            at = scrobble.album_title.replace(' ', '+')
+            tt = scrobble.track_title.replace(' ', '+')
+            match scrobble.scrobble_type:
+                case ScrobbleType.ARTIST:
+                    q = f'artist:"{an}"'
+                case ScrobbleType.ALBUM:
+                    q = f'artist:"{an}" album:"{at}"'
+                case ScrobbleType.TRACK:
+                    q = f'artist:"{an}" track:"{tt}"'
+
+            logger.debug(f'searching spotify for query: "{q}" type {scrobble.scrobble_type.value}')
+            data = await self.client.search.search(q=q, types=[scrobble.scrobble_type.value], limit=25)
             results = getattr(data, scrobble.scrobble_type.value + 's')
             if not results or not results.items:
                 logger.debug(f'no spotify results found for query: {q}')
                 return scrobble
-            provider_id = results.items[0].id
+            provider_id = self._match(scrobble, results.items).id
             logger.debug(f'found spotify provider id for query {q}: {provider_id}')
         result = await self._get(provider_id, scrobble.scrobble_type)
 
