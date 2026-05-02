@@ -1,20 +1,28 @@
 # Changelog
 
+## 3.0.10
+*Released on May 2, 2026*
+
+* Add support for scrobbling Musicbrainz links just like Spotify and YouTube
+(`79b44e0`)
+
+
 ## 3.0.9
-*Released on June 16, 2026*
+*Released on April 16, 2026*
 
 * Add Genius as a lyrics provider, along with an amender for it (`51d4d7e`)
 
 
 ## 3.0.8
-*Released on June 15, 2026*
+*Released on April 15, 2026*
 
 * Add basic MusicBrainz amenders for artists, albums and tracks (`68db30e`)
 * Message early if an user attempts to amend a scrobble that he didn't submit
   himself. Do this in a DM to the user so the chat doesn't get spammed (`c261e1e`)
 
+
 ## 3.0.7
-*Released on June 14, 2026*
+*Released on April 14, 2026*
 
 * Make the MusicBrainz album fill more lenient, falling back to a query without
   the year if the initial search fails (`8b4e3bb`)
@@ -25,34 +33,31 @@
 
 
 ## 3.0.6
-*Released on June 14, 2026*
+*Released on April 14, 2026*
 
 * Improved Deezer fill accuracy, matching on a list of candidates (`eeee5c6`)
 * Add basic Deezer amenders for artists, albums and tracks (`b18c098`)
 
 
 ## 3.0.5
-
-*Released on June 13, 2026*
+*Released on April 13, 2026*
 
 * Fix musicbrainz album link (`2b3ee4f`)
 
 
 ## 3.0.4
-
-*Released on June 13, 2026*
+*Released on April 13, 2026*
 
 * Add `/help` command to show usage instructions (`351119f`)
 
 
 ## 3.0.3
+*Released on April 13, 2026*
 
-*Released on June 13, 2026*
 * Change `/ranking` command to show all-time ranking instead of monthly (`381d8d6`)
 
 
 ## 3.0.2
-
 *Released on April 13, 2026*
 
 * Faster migration, reuse db connection (`8fc0ef5`)
@@ -60,7 +65,6 @@
 
 
 ## 3.0.1
-
 *Released on April 13, 2026*
 
 * Fix digest links (`d9c8e5b`)
@@ -68,7 +72,6 @@
 
 
 ## 3.0.0
-
 *Released on April 4, 2026*
 
 * Updated to python 3.14
@@ -83,7 +86,6 @@
 
 
 ## 0.2.1
-
 *Released on August 22, 2023*
 
 * Updated youtube_dl to latest version (`54379e7`)
@@ -91,6 +93,8 @@
 * Allow whitespace between `!` and the command / uri (`9f9a16d`)
 * Switched to vscode black formatting extension (`9950d64`)
 
+
 ## 0.2.0
+*Released on February 20, 2022*
 
 * Initial public release
