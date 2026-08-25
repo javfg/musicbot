@@ -160,6 +160,17 @@ def main() -> None:
         asyncio.run(migrate(config))
         sys.exit(0)
 
+    if sys.argv[1:] and sys.argv[1] == '--healthcheck':
+        import httpx
+        try:
+            r = httpx.get(
+                f'http://localhost:{config.healthcheck_port}/health',
+                timeout=5
+            )
+            sys.exit(0 if r.status_code == 200 else 1)
+        except httpx.HTTPError:
+            sys.exit(1)
+
     if config.env == 'production':
         logger.info('production instance, running with healthcheck')
         healthcheck_thread = Thread(target=start_healthcheck, args=(config,), daemon=True)
