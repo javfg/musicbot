@@ -1,5 +1,6 @@
 import re
 
+import httpx
 from cache import AsyncTTL
 from loguru import logger
 from spotify_sdk import AsyncSpotifyClient
@@ -12,12 +13,15 @@ from musicbot.model.request import Request
 from musicbot.model.scrobble import Scrobble, ScrobbleType
 from musicbot.util.date import date_from_iso
 
+FAKE_USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0'
+
 
 class SpotifyProvider(SearchableProvider):
     name = 'spotify'
     weight = 30
     routes = [
         r'https?://open\.spotify\.com/(?:intl-[a-z]+/)?(?P<type>track|album|artist)/(?P<id>[\w]+)',
+        r'https?://open\.spotify\.com/s/(?P<id>[\w]+)',
     ]
     amenders = [
         Amender(
@@ -43,6 +47,10 @@ class SpotifyProvider(SearchableProvider):
             client_secret=settings['spotify_client_secret'],
         )
         self.client = AsyncSpotifyClient(auth_provider=auth)
+        self.http_client = httpx.AsyncClient(
+            headers={'User-Agent': FAKE_USER_AGENT},
+            timeout=config.provider_timeout,
+        )
 
     @AsyncTTL(maxsize=PROVIDER_CACHE_SIZE, time_to_live=PROVIDER_CACHE_TTL)
     async def _get(self, id: str, scrobble_type: ScrobbleType) -> Album | Artist | Track:
@@ -78,7 +86,18 @@ class SpotifyProvider(SearchableProvider):
             return None
         return getattr(images[index], 'url', None)
 
+    async def _resolve_short_link(self, url: str) -> str:
+        resp = await self.http_client.get(url, follow_redirects=True)
+        resp.raise_for_status()
+        logger.debug(f'{resp.url} {resp.headers}')
+        return str(resp.url)
+
     async def search(self, query: str, limit: int | None = 5) -> list[Request]:
+        # if it is a shortened link, we need to resolve it
+        if re.match(self.routes[1], query):
+            query = await self._resolve_short_link(query)
+            logger.debug(f'spotify shortened resolves to: {query}')
+
         # first we try to match the query to a spotify link
         results = []
         m = re.match(self.routes[0], query)
