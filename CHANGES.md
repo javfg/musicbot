@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.0.12
+*Released on August 25, 2026*
+
+* Follow redirects on Spotify shortened links like: https://open.spotify.com/s/...
+  to resolve them to proper Spotify links when used as a search query (`2809a25`)
+* Add a `--healthcheck` cli argument to avoid using curl and other stuff that may
+  not be present in the docker image (`4df8e56`)
+
+
 ## 3.0.11
 *Released on May 3, 2026*
 
